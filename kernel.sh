@@ -81,7 +81,7 @@ function build_kernel {
 	
 	make O=out $DEFCONFIG
 	BUILD_START=$(date +"%s")
-	tg_post_msg "★★Build Started on $(uname)"
+	tg_post_msg "★★Build Started on $(uname) $(uname -r)★★"
 	make -j8 O=out \
 		CC=$KERNEL_DIR/clang-r328903/bin/clang \
 		CLANG_TRIPLE=aarch64-linux-gnu- \
@@ -92,14 +92,14 @@ function build_kernel {
 }
 
 function check_img {
-	if [ -f $KERNEL_DIR/arch/arm64/boot/Image.gz-dtb ]
+	if [ -f $KERNEL_DIR/out/arch/arm64/boot/Image.gz-dtb ]
 	then 
 		echo -e "Kernel Built Successfully in $(($DIFF / 60)) minute(s) and $(($DIFF % 60)) seconds..!!"
-		tg_post_msg "Kernel Built Successfully in $(($DIFF / 60)) minute(s) and $(($DIFF % 60)) seconds..!!"
+		tg_post_msg "👍👍Kernel Built Successfully in $(($DIFF / 60)) minute(s) and $(($DIFF % 60)) seconds..!!"
 		gen_changelog
 	else 
 		echo -e "Kernel failed to compile after $(($DIFF / 60)) minute(s) and $(($DIFF % 60)) seconds..!!"
-		tg_post_msg "Kernel failed to compile after $(($DIFF / 60)) minute(s) and $(($DIFF % 60)) seconds..!!"
+		tg_post_msg "☠☠Kernel failed to compile after $(($DIFF / 60)) minute(s) and $(($DIFF % 60)) seconds..!!"
 		exit
 	fi	
 }
