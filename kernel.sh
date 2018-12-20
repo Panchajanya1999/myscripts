@@ -97,6 +97,7 @@ function check_img {
 		echo -e "Kernel Built Successfully in $(($DIFF / 60)) minute(s) and $(($DIFF % 60)) seconds..!!"
 		tg_post_msg "👍👍Kernel Built Successfully in $(($DIFF / 60)) minute(s) and $(($DIFF % 60)) seconds..!!"
 		gen_changelog
+		gen_zip
 	else 
 		echo -e "Kernel failed to compile after $(($DIFF / 60)) minute(s) and $(($DIFF % 60)) seconds..!!"
 		tg_post_msg "☠☠Kernel failed to compile after $(($DIFF / 60)) minute(s) and $(($DIFF % 60)) seconds..!!"
@@ -109,11 +110,19 @@ function gen_changelog {
 	$(git log --oneline --decorate --color --pretty=%s --first-parent -7)"
 }
 
+function gen_zip {
+	if [ -f $KERNEL_DIR/out/arch/arm64/boot/Image.gz-dtb ]
+	then 
+		echo "Zipping Files.."
+		mv $KERNEL_DIR/out/arch/arm64/boot/Image.gz-dtb AnyKernel2/Image.gz-dtb
+		cd AnyKernel2
+		zip -r AzurE-X00TD-$BUILD_TIME * -x .git README.md
+		tg_post_build "AzurE-X00TD-$BUILD_TIME.zip"
+		cd ..
+	fi
+}
 
 clone
 exports
 build_kernel
 check_img
-
-
-
