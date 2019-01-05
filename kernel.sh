@@ -51,6 +51,10 @@ function exports {
 	export ARCH=arm64
 	export SUBARCH=arm64
 	export KBUILD_COMPILER_STRING=$($KERNEL_DIR/clang-r328903/bin/clang --version | head -n 1 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g' -e 's/[[:space:]]*$//')
+	LD_LIBRARY_PATH=$KERNEL_DIR/clang-r328903/lib64:$LD_LIBRARY_PATH
+	export LD_LIBRARY_PATH
+	PATH=$KERNEL_DIR/clang-r328903/bin/:$KERNEL_DIR/aarch64-linux-android-4.9/bin/:$PATH
+	export PATH
 }
 
 function tg_post_msg {
