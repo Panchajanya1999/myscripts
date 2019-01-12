@@ -1,0 +1,2 @@
+# myscripts
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/916a254720864c96ba0a4131c128f30c)](https://app.codacy.com/app/Panchajanya1999/myscripts?utm_source=github.com&utm_medium=referral&utm_content=Panchajanya1999/myscripts&utm_campaign=Badge_Grade_Settings)
