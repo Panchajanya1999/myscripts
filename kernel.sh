@@ -90,19 +90,19 @@ function build_kernel {
 		CROSS_COMPILE=$KERNEL_DIR/aarch64-linux-android-4.9/bin/aarch64-linux-android- 2>&1 | tee logcat.txt
 	BUILD_END=$(date +"%s")
 	BUILD_TIME=$(date +"%Y%m%d-%T")
-	DIFF=$(($BUILD_END - $BUILD_START))	
+	DIFF=$((BUILD_END - BUILD_START))	
 }
 
 function check_img {
 	if [ -f $KERNEL_DIR/out/arch/arm64/boot/Image.gz-dtb ]
 	then 
-		echo -e "Kernel Built Successfully in $(($DIFF / 60)) minute(s) and $(($DIFF % 60)) seconds..!!"
-		tg_post_msg "👍👍Kernel Built Successfully in $(($DIFF / 60)) minute(s) and $(($DIFF % 60)) seconds..!!" "$GROUP_ID"
+		echo -e "Kernel Built Successfully in $((DIFF / 60)) minute(s) and $((DIFF % 60)) seconds..!!"
+		tg_post_msg "👍👍Kernel Built Successfully in $((DIFF / 60)) minute(s) and $((DIFF % 60)) seconds..!!" "$GROUP_ID"
 		gen_changelog
 		gen_zip
 	else 
-		echo -e "Kernel failed to compile after $(($DIFF / 60)) minute(s) and $(($DIFF % 60)) seconds..!!"
-		tg_post_msg "☠☠Kernel failed to compile after $(($DIFF / 60)) minute(s) and $(($DIFF % 60)) seconds..!!" "$GROUP_ID"
+		echo -e "Kernel failed to compile after $((DIFF / 60)) minute(s) and $((DIFF % 60)) seconds..!!"
+		tg_post_msg "☠☠Kernel failed to compile after $((DIFF / 60)) minute(s) and $((DIFF % 60)) seconds..!!" "$GROUP_ID"
 		tg_post_build "logcat.txt" "$GROUP_ID"
 	fi	
 }
