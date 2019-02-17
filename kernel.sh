@@ -29,20 +29,19 @@ function colors {
 	nocol='\033[0m'
 }
 
-colors;
 
 function clone {
 	echo " "
-	echo "★★Cloning GCC Toolchain from Android GoogleSource .."
+	echo "{yellow}★★Cloning GCC Toolchain from Android GoogleSource ..{nocol}"
 	sleep 2
-	git clone --depth=1 --no-single-branch https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9.git
-	echo "★★GCC cloning done"
+	git clone --depth 1 --no-single-branch https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9.git
+	echo "{blue}★★GCC cloning done{nocol}"
 	sleep 2
-	echo "★★Cloning Clang 7 sources (r328903)"
-	git clone --depth=1 https://github.com/Panchajanya1999/clang-llvm.git -b 8.0
-	echo "★★Clang Done, Now Its time for AnyKernel .."
-	git clone --depth=1 --no-single-branch https://github.com/Panchajanya1999/AnyKernel2.git
-	echo "★★Cloning Kinda Done..!!!"
+	echo "{yellow}★★Cloning Clang 7 sources (r349610){nocol}"
+	git clone --depth 1 https://github.com/Panchajanya1999/clang-llvm.git -b 8.0
+	echo "{blue}★★Clang Done, Now Its time for AnyKernel ..{nocol}"
+	git clone --depth 1 --no-single-branch https://github.com/Panchajanya1999/AnyKernel2.git
+	echo "{cyan}★★Cloning Kinda Done..!!!{nocol}"
 }
 
 function exports {
@@ -74,9 +73,9 @@ function build_kernel {
 	then
 		DEFCONFIG=X00TD_defconfig
 	else
-		echo "Defconfig Mismatch"
+		echo "{red}Defconfig Mismatch..!!!{nocol}"
 		tg_post_msg "☠☠Defconfig Mismatch..!! Build Failed..!!👎👎" "$GROUP_ID"
-		echo "Exiting in 5 seconds"
+		echo "{red}Exiting in 5 seconds...{nocol}"
 		sleep 5
 		exit
 	fi
@@ -96,12 +95,12 @@ function build_kernel {
 function check_img {
 	if [ -f $KERNEL_DIR/out/arch/arm64/boot/Image.gz-dtb ]
 	then 
-		echo -e "Kernel Built Successfully in $((DIFF / 60)) minute(s) and $((DIFF % 60)) seconds..!!"
+		echo -e "{yellow}Kernel Built Successfully in $((DIFF / 60)) minute(s) and $((DIFF % 60)) seconds..!!{nocol}"
 		tg_post_msg "👍👍Kernel Built Successfully in $((DIFF / 60)) minute(s) and $((DIFF % 60)) seconds..!!" "$GROUP_ID"
 		gen_changelog
 		gen_zip
 	else 
-		echo -e "Kernel failed to compile after $((DIFF / 60)) minute(s) and $((DIFF % 60)) seconds..!!"
+		echo -e "{red}Kernel failed to compile after $((DIFF / 60)) minute(s) and $((DIFF % 60)) seconds..!!{nocol}"
 		tg_post_msg "☠☠Kernel failed to compile after $((DIFF / 60)) minute(s) and $((DIFF % 60)) seconds..!!" "$GROUP_ID"
 		tg_post_build "logcat.txt" "$GROUP_ID"
 	fi	
@@ -115,7 +114,7 @@ function gen_changelog {
 function gen_zip {
 	if [ -f $KERNEL_DIR/out/arch/arm64/boot/Image.gz-dtb ]
 	then 
-		echo "Zipping Files.."
+		echo "{yellow}Zipping Files..{nocol}"
 		mv $KERNEL_DIR/out/arch/arm64/boot/Image.gz-dtb AnyKernel2/Image.gz-dtb
 		cd AnyKernel2
 		zip -r9 AzurE-X00TD-$BUILD_TIME * -x .git README.md
@@ -124,6 +123,7 @@ function gen_zip {
 	fi
 }
 
+colors
 clone
 exports
 build_kernel
