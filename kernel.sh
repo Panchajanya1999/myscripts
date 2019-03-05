@@ -34,7 +34,13 @@ function clone {
 	echo " "
 	echo "{yellow}★★Cloning GCC Toolchain from Android GoogleSource ..{nocol}"
 	sleep 2
-	git clone --depth 1 --no-single-branch https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9.git
+	git clone --depth 5 --no-single-branch https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9.git
+
+	#Workaround to remove deprecation spam of gcc
+	cd aarch64-linux-android-4.9
+	git reset --hard 22f053ccdfd0d73aafcceff3419a5fe3c01e878b
+	cd $KERNEL_DIR	
+
 	echo "{blue}★★GCC cloning done{nocol}"
 	sleep 2
 	echo "{yellow}★★Cloning Clang 7 sources (r349610){nocol}"
