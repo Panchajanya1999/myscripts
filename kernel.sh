@@ -35,11 +35,14 @@ function clone {
 	echo "{yellow}★★Cloning GCC Toolchain from Android GoogleSource ..{nocol}"
 	sleep 2
 	git clone --depth 5 --no-single-branch https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9.git
+	git clone --depth 5 --no-single-branch https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9
 
 	#Workaround to remove deprecation spam of gcc
 	cd aarch64-linux-android-4.9
 	git reset --hard 22f053ccdfd0d73aafcceff3419a5fe3c01e878b
-	cd $KERNEL_DIR	
+	cd $KERNEL_DIR/arm-linux-androideabi-4.9
+	git reset --hard 42e5864a7d23921858ca8541d52028ff88acb2b6
+	cd $KERNEL_DIR
 
 	echo "{blue}★★GCC cloning done{nocol}"
 	sleep 2
@@ -92,6 +95,7 @@ function build_kernel {
 	make -j8 O=out \
 		CC=$KERNEL_DIR/clang-llvm/bin/clang \
 		CLANG_TRIPLE=aarch64-linux-gnu- \
+		CROSS_COMPILE_ARM32=$KERNEL_DIR/arm-linux-androideabi-4.9/bin/arm-linux-androideabi- \
 		CROSS_COMPILE=$KERNEL_DIR/aarch64-linux-android-4.9/bin/aarch64-linux-android- 2>&1 | tee logcat.txt
 	BUILD_END=$(date +"%s")
 	BUILD_TIME=$(date +"%Y%m%d-%T")
