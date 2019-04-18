@@ -55,7 +55,7 @@ function clone {
 
 function exports {
 	export KBUILD_BUILD_USER="ci"
-	export KBUILD_BUILD_HOST="semaphore"
+	export KBUILD_BUILD_HOST="panchajanya"
 	export ARCH=arm64
 	export SUBARCH=arm64
 	export KBUILD_COMPILER_STRING=$($KERNEL_DIR/clang-llvm/bin/clang --version | head -n 1 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g' -e 's/[[:space:]]*$//')
@@ -89,6 +89,9 @@ function build_kernel {
 		exit
 	fi
 	
+	# I am adding CAF tag version to kernel name for some personal reasons
+	sed -i -e '/CONFIG_LOCALVERSION=/s/-azure/-azure[LA.UM.7.2.r1-06700-sdm660.0]/' $DEFCONFIG
+
 	make O=out $DEFCONFIG
 	BUILD_START=$(date +"%s")
 	tg_post_msg "★★ Build Started on $(uname) $(uname -r) ★★" "$GROUP_ID"
@@ -107,7 +110,7 @@ function check_img {
 	then 
 		echo -e "{yellow}Kernel Built Successfully in $((DIFF / 60)) minute(s) and $((DIFF % 60)) seconds..!!{nocol}"
 		tg_post_msg "👍👍Kernel Built Successfully in $((DIFF / 60)) minute(s) and $((DIFF % 60)) seconds..!!" "$GROUP_ID"
-		gen_changelog
+		#gen_changelog //Stop posting changelogs as of now
 		gen_zip
 	else 
 		echo -e "{red}Kernel failed to compile after $((DIFF / 60)) minute(s) and $((DIFF % 60)) seconds..!!{nocol}"
@@ -127,8 +130,8 @@ function gen_zip {
 		echo "{yellow}Zipping Files..{nocol}"
 		mv $KERNEL_DIR/out/arch/arm64/boot/Image.gz-dtb AnyKernel2/Image.gz-dtb
 		cd AnyKernel2
-		zip -r9 AzurE-X00TD-$BUILD_TIME * -x .git README.md
-		tg_post_build "AzurE-X00TD-$BUILD_TIME.zip" "$GROUP_ID"
+		zip -r9 azure-X00T-$BUILD_TIME * -x .git README.md
+		tg_post_build "azure-X00T-$BUILD_TIME.zip" "$GROUP_ID"
 		cd ..
 	fi
 }
