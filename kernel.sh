@@ -49,7 +49,7 @@ function clone {
 	echo "{yellow}★★Cloning Clang 7 sources (r349610){nocol}"
 	git clone --depth 1 https://github.com/Panchajanya1999/clang-llvm.git -b 8.0
 	echo "{blue}★★Clang Done, Now Its time for AnyKernel ..{nocol}"
-	git clone --depth 1 --no-single-branch https://github.com/Panchajanya1999/AnyKernel2.git
+	git clone --depth 1 --no-single-branch https://github.com/Panchajanya1999/AnyKernel2.git -b violet
 	echo "{cyan}★★Cloning Kinda Done..!!!{nocol}"
 }
 
@@ -75,12 +75,9 @@ function tg_post_build {
 
 function build_kernel {
 	#better checking defconfig at first
-	if [ -f $KERNEL_DIR/arch/arm64/configs/X00T_defconfig ]
+	if [ -f $KERNEL_DIR/arch/arm64/configs/vendor/violet-perf_defconfig ]
 	then 
-		DEFCONFIG=X00T_defconfig
-	elif [ -f $KERNEL_DIR/arch/arm64/configs/X00TD_defconfig ]
-	then
-		DEFCONFIG=X00TD_defconfig
+		DEFCONFIG=vendor/violet-perf_defconfig
 	else
 		echo "{red}Defconfig Mismatch..!!!{nocol}"
 		tg_post_msg "☠☠Defconfig Mismatch..!! Build Failed..!!👎👎" "$GROUP_ID"
@@ -89,12 +86,10 @@ function build_kernel {
 		exit
 	fi
 	
-	# I am adding CAF tag version to kernel name for some personal reasons
-	sed -i -e '/CONFIG_LOCALVERSION=/s/-azure/-azure[LA.UM.7.2.r1-06700-sdm660.0]/' $DEFCONFIG
-
 	make O=out $DEFCONFIG
 	BUILD_START=$(date +"%s")
 	tg_post_msg "★★ Build Started on $(uname) $(uname -r) ★★" "$GROUP_ID"
+	tg_post_msg "**Device : **`Redmi Note 7 Pro(violet)`" "$GROUP_ID"
 	make -j8 O=out \
 		CC=$KERNEL_DIR/clang-llvm/bin/clang \
 		CLANG_TRIPLE=aarch64-linux-gnu- \
@@ -130,8 +125,8 @@ function gen_zip {
 		echo "{yellow}Zipping Files..{nocol}"
 		mv $KERNEL_DIR/out/arch/arm64/boot/Image.gz-dtb AnyKernel2/Image.gz-dtb
 		cd AnyKernel2
-		zip -r9 azure-X00T-$BUILD_TIME * -x .git README.md
-		tg_post_build "azure-X00T-$BUILD_TIME.zip" "$GROUP_ID"
+		zip -r9 azure-VIOLET-$BUILD_TIME * -x .git README.md
+		tg_post_build "azure-VIOLET-$BUILD_TIME.zip" "$GROUP_ID"
 		cd ..
 	fi
 }
