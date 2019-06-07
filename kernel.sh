@@ -164,7 +164,7 @@ function tg_post_build {
 
 function build_kernel {
 	if [ "$build_push" = true ]; then
-		tg_post_msg "<b>CI Build Triggered</b>%0A<b>Date : </b><code>$(TZ=Asia/Jakarta date)</code>%0A<b>Device : </b><code>$DEVICE</code>%0A<b>Pipeline Host : </b><code>CircleCI</code>%0A<b>Compiler Used : </b><code>$KBUILD_COMPILER_STRING</code>%0A<b>Status : </b><code>#Nightly</code>" "$CHATID"
+		tg_post_msg "<b>CI Build Triggered</b>%0A<b>Date : </b><code>$(TZ=Asia/Jakarta date)</code>%0A<b>Device : </b><code>$DEVICE</code>%0A<b>Pipeline Host : </b><code>CircleCI</code>%0A<b>Compiler Used : </b><code>$KBUILD_COMPILER_STRING</code>%0A<b>Status : </b>#Nightly" "$CHATID"
 	fi
 	make O=out $DEFCONFIG
 	BUILD_START=$(date +"%s")
@@ -193,9 +193,8 @@ function gen_zip {
 	mv $KERNEL_DIR/out/arch/arm64/boot/Image.gz-dtb AnyKernel2/Image.gz-dtb
 	cd AnyKernel2
 	zip -r9 azure-$ARG1-$DATE * -x .git README.md
-	ZIP=$(echo azure-*.zip)
-	MD5CHECK=md5sum $ZIP | grep -v "$ZIP"
-	tg_post_build "$ZIP" "$GROUP_ID" "<b>Build took : </b><code>$((DIFF / 60)) minute(s) and $((DIFF % 60)) seconds</code>%0A<b>md5check sum : </b><code>$MD5CHECK</code>s"
+	MD5CHECK=$(md5sum azure-$ARG1-$DATE.zip)
+	tg_post_build "azure-$ARG1-$DATE.zip" "$GROUP_ID" "<b>Build took : </b><code>$((DIFF / 60)) minute(s) and $((DIFF % 60)) seconds</code>%0A<b>md5check sum : </b><code>$MD5CHECK</code>s"
 	cd ..
 }
 
