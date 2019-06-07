@@ -174,6 +174,7 @@ function build_kernel {
 		CROSS_COMPILE=$KERNEL_DIR/aarch64-linux-android-4.9/bin/aarch64-linux-android- 2>&1 | tee build.log
 	BUILD_END=$(date +"%s")
         DIFF=$((BUILD_END - BUILD_START))
+}
 
 ##-------------------------------------------------------------##
 
