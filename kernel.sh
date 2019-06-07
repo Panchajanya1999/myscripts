@@ -25,7 +25,6 @@ ARG1=$1 #It is the devicename [generally codename]
 ARG2=$2 #It is the make arguments, whether CLEAN / DIRTY / DEF_REG[regenerates defconfig]
 ARG3=$3 #Build should be pushed or not [PUSH / !PUSH]
 DATE=$(TZ=Asia/Jakarta date +"%Y%m%d-%T")
-DIFF=$((BUILD_END - BUILD_START))
 
 ##----------------------------------------------------##
 
@@ -174,7 +173,7 @@ function build_kernel {
 		CROSS_COMPILE_ARM32=$KERNEL_DIR/arm-linux-androideabi-4.9/bin/arm-linux-androideabi- \
 		CROSS_COMPILE=$KERNEL_DIR/aarch64-linux-android-4.9/bin/aarch64-linux-android- 2>&1 | tee build.log
 	BUILD_END=$(date +"%s")
-}
+        DIFF=$((BUILD_END - BUILD_START))
 
 ##-------------------------------------------------------------##
 
@@ -194,7 +193,7 @@ function gen_zip {
 	cd AnyKernel2
 	zip -r9 azure-$ARG1-$DATE * -x .git README.md
 	MD5CHECK=$(md5sum azure-$ARG1-$DATE.zip)
-	tg_post_build "azure-$ARG1-$DATE.zip" "$GROUP_ID" "<b>Build took : </b><code>$((DIFF / 60)) minute(s) and $((DIFF % 60)) seconds</code>%0A<b>md5check sum : </b><code>$MD5CHECK</code>s"
+	tg_post_build "azure-$ARG1-$DATE.zip" "$GROUP_ID" "<b>Build took : </b><code>$((DIFF / 60)) minute(s) and $((DIFF % 60)) seconds</code>"
 	cd ..
 }
 
