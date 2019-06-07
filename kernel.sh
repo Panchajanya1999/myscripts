@@ -59,10 +59,10 @@ esac # END : Argument 1 [ARG2] Check
 # START : Argument 2 [ARG1] Check
 case "$ARG2" in
   "CLEAN" ) # Execute Clean build function
-      export MAKE="make clean && make mrproper && rm -rf out"
+      alias MAKE="make clean && make mrproper && rm -rf out"
   ;;
   "DIRTY" ) # Do not CLEAN
-      export MAKE=""
+      
   ;;
   "DEF_REG" ) # Regenerate defconfig
       make O=out $DEFCONFIG
