@@ -195,7 +195,7 @@ function gen_zip {
 	cd AnyKernel2
 	zip -r9 $ZIPNAME-$ARG1-$DATE * -x .git README.md
 	MD5CHECK=$(md5sum $ZIPNAME-$ARG1-$DATE.zip)
-	tg_post_build "$ZIPNAME-$ARG1-$DATE.zip" "$GROUP_ID" "<b>Build took : </b><code>$((DIFF / 60)) minute(s) and $((DIFF % 60)) second(s)</code>%0A<b>md5check sum : </b><code>$MD5CHECK</code>"
+	tg_post_build "*.zip" "$GROUP_ID" "Build took : $((DIFF / 60)) minute(s) and $((DIFF % 60)) second(s)"
 	cd ..
 }
 
