@@ -22,10 +22,10 @@
 
 KERNEL_DIR=$PWD
 ARG1=$1 #It is the devicename [generally codename]
-ARG2=$2 #It is the make arguments, whether CLEAN / DIRTY / DEF_REG[regenerates defconfig]
-ARG3=$3 #Build should be pushed or not [PUSH / !PUSH]
+ARG2=$2 #It is the make arguments, whether clean / dirty / def_regs [regenerates defconfig]
+ARG3=$3 #Build should be pushed or not [PUSH / NOPUSH]
 DATE=$(TZ=Asia/Jakarta date +"%Y%m%d-%T")
-DIFF=$((BUILD_END - BUILD_START))
+export ZIPNAME="azure" #Specifies the name of kernel
 
 ##----------------------------------------------------##
 
@@ -58,17 +58,17 @@ esac # END : Argument 1 [ARG2] Check
 
 # START : Argument 2 [ARG1] Check
 case "$ARG2" in
-  "CLEAN" ) # Execute Clean build function
+  "clean" ) # Execute Clean build function
       alias MAKE="make clean && make mrproper && rm -rf out"
   ;;
-  "DIRTY" ) # Do not CLEAN
+  "dirty" ) # Do not CLEAN
       
   ;;
-  "DEF_REG" ) # Regenerate defconfig
+  "def_reg" ) # Regenerate defconfig
       make O=out $DEFCONFIG
       mv out/.config $DEFCONFIG
       echo "Defconfig Regenerated"
-      return;
+      exit 1;
   ;;
   * ) echo -e "\nError..!! Unknown Build Command.\n"
       return
@@ -82,7 +82,7 @@ case "$ARG3" in
   "PUSH" ) # Push build to TG Channel
       build_push=true
   ;;
-  "!PUSH" ) # Do not push
+  "NOPUSH" ) # Do not push
       build_push=false
   ;;
   * ) echo -e "\nError..!! Unknown command. Please refer README.\n"
@@ -153,11 +153,11 @@ function tg_post_msg {
 ##----------------------------------------------------------------##
 
 function tg_post_build {
-	curl -F chat_id="$2" -F document=@"$1" \
+	curl -F document=@"$1" $BOT_BUILD_URL \
+	-F chat_id="$2"  \
 	-F "disable_web_page_preview=true" \
 	-F "parse_mode=html" \
-	-F caption="$3" \
-	 $BOT_BUILD_URL
+	-F caption="$3"  
 }
 
 ##----------------------------------------------------------##
@@ -172,8 +172,9 @@ function build_kernel {
 		CC=$KERNEL_DIR/clang-llvm/bin/clang \
 		CLANG_TRIPLE=aarch64-linux-gnu- \
 		CROSS_COMPILE_ARM32=$KERNEL_DIR/arm-linux-androideabi-4.9/bin/arm-linux-androideabi- \
-		CROSS_COMPILE=$KERNEL_DIR/aarch64-linux-android-4.9/bin/aarch64-linux-android- 2>&1 | tee build.log
+		CROSS_COMPILE=$KERNEL_DIR/aarch64-linux-android-4.9/bin/aarch64-linux-android- 2>&1 | tee error.log
 	BUILD_END=$(date +"%s")
+	DIFF=$((BUILD_END - BUILD_START))
 }
 
 ##-------------------------------------------------------------##
@@ -192,9 +193,9 @@ function check_img {
 function gen_zip {
 	mv $KERNEL_DIR/out/arch/arm64/boot/Image.gz-dtb AnyKernel2/Image.gz-dtb
 	cd AnyKernel2
-	zip -r9 azure-$ARG1-$DATE * -x .git README.md
-	MD5CHECK=$(md5sum azure-$ARG1-$DATE.zip)
-	tg_post_build "azure-$ARG1-$DATE.zip" "$GROUP_ID" "<b>Build took : </b><code>$((DIFF / 60)) minute(s) and $((DIFF % 60)) seconds</code>%0A<b>md5check sum : </b><code>$MD5CHECK</code>s"
+	zip -r9 $ZIPNAME-$ARG1-$DATE * -x .git README.md
+	MD5CHECK=$(md5sum $ZIPNAME-$ARG1-$DATE.zip)
+	tg_post_build "$ZIPNAME-$ARG1-$DATE.zip" "$GROUP_ID" "<b>Build took : </b><code>$((DIFF / 60)) minute(s) and $((DIFF % 60)) second(s)</code>%0A<b>md5check sum : </b><code>$MD5CHECK</code>"
 	cd ..
 }
 
