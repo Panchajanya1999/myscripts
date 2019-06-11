@@ -184,7 +184,7 @@ function check_img {
 	    then
 		gen_zip
 	else
-		tg_post_build "build.log" "$CHATID" "<b>Build failed to compile after $((DIFF / 60)) minute(s) and $((DIFF % 60)) seconds</b>"
+		tg_post_build "error.log" "$CHATID" "<b>Build failed to compile after $((DIFF / 60)) minute(s) and $((DIFF % 60)) seconds</b>"
 	fi
 }
 
@@ -195,7 +195,8 @@ function gen_zip {
 	cd AnyKernel2
 	zip -r9 $ZIPNAME-$ARG1-$DATE * -x .git README.md
 	MD5CHECK=$(md5sum $ZIPNAME-$ARG1-$DATE.zip)
-	tg_post_build "*.zip" "$GROUP_ID" "Build took : $((DIFF / 60)) minute(s) and $((DIFF % 60)) second(s)"
+	ZIP=$ZIPNAME*
+	tg_post_build $ZIPNAME* "$CHATID" "Build took : $((DIFF / 60)) minute(s) and $((DIFF % 60)) second(s)"
 	cd ..
 }
 
