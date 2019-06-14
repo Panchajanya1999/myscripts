@@ -153,7 +153,7 @@ function tg_post_msg {
 ##----------------------------------------------------------------##
 
 function tg_post_build {
-	curl -F document=@"$1" $BOT_BUILD_URL \
+	curl --progress-bar -F document=@"$1" $BOT_BUILD_URL \
 	-F chat_id="$2"  \
 	-F "disable_web_page_preview=true" \
 	-F "parse_mode=html" \
