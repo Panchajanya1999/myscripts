@@ -65,6 +65,8 @@ case "$ARG2" in
       
   ;;
   "def_reg" ) # Regenerate defconfig
+      export ARCH=arm64
+      export SUBARCH=arm64
       make O=out $DEFCONFIG
       mv out/.config $DEFCONFIG
       echo "Defconfig Regenerated"
