@@ -123,6 +123,8 @@ function clone {
 	git clone --depth 1 https://github.com/Panchajanya1999/clang-llvm.git -b 8.0
 	echo "★★Clang Done, Now Its time for AnyKernel .."
 	git clone --depth 1 --no-single-branch https://github.com/Panchajanya1999/AnyKernel2.git -b $ARG1
+	echo "★★Cloning libufdt"
+	git clone https://android.googlesource.com/platform/system/libufdt $KERNEL_DIR/scripts/ufdt/libufdt
 	echo "★★Cloning Kinda Done..!!!"
 }
 
@@ -175,6 +177,8 @@ function build_kernel {
 		CLANG_TRIPLE=aarch64-linux-gnu- \
 		CROSS_COMPILE_ARM32=$KERNEL_DIR/arm-linux-androideabi-4.9/bin/arm-linux-androideabi- \
 		CROSS_COMPILE=$KERNEL_DIR/aarch64-linux-android-4.9/bin/aarch64-linux-android- 2>&1 | tee error.log
+	export CROSS_COMPILE=$KERNEL_DIR/aarch64-linux-android-4.9/bin/aarch64-linux-android-
+	make O=out dtbo.img
 	BUILD_END=$(date +"%s")
 	DIFF=$((BUILD_END - BUILD_START))
 }
@@ -194,6 +198,7 @@ function check_img {
 
 function gen_zip {
 	mv $KERNEL_DIR/out/arch/arm64/boot/Image.gz-dtb AnyKernel2/Image.gz-dtb
+	mv $KERNEL_DIR/out/arch/arm64/boot/dtbo.img AnyKernel2/dtbo.img
 	cd AnyKernel2
 	zip -r9 $ZIPNAME-$ARG1-$DATE * -x .git README.md
 	MD5CHECK=$(md5sum $ZIPNAME-$ARG1-$DATE.zip)
