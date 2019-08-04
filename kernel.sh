@@ -42,7 +42,7 @@ case "$ARG1" in
   "violet" ) # Execute violet function / scripts
       export DEVICE="Redmi Note 7 Pro [violet]"
       DEFCONFIG=vendor/violet-perf_defconfig
-      CHATID="-1001260378423"
+      CHATID="-1001245830369"
   ;;
   "X00T" ) # Execute X00T function / scripts
       export DEVICE="ASUS Zenfone Max Pro M1"
