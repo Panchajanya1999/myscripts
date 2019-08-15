@@ -172,11 +172,14 @@ function build_kernel {
 	fi
 	make O=out $DEFCONFIG
 	BUILD_START=$(date +"%s")
+	#we need to define seperately because of vdso
+	export CROSS_COMPILE_ARM32=$KERNEL_DIR/arm-linux-androideabi-4.9/bin/arm-linux-androideabi-
 	make -j8 O=out \
 		CC=$KERNEL_DIR/clang-llvm/bin/clang \
 		CLANG_TRIPLE=aarch64-linux-gnu- \
-		CROSS_COMPILE_ARM32=$KERNEL_DIR/arm-linux-androideabi-4.9/bin/arm-linux-androideabi- \
 		CROSS_COMPILE=$KERNEL_DIR/aarch64-linux-android-4.9/bin/aarch64-linux-android- 2>&1 | tee error.log
+
+	#we need to define again for dtbo
 	export CROSS_COMPILE=$KERNEL_DIR/aarch64-linux-android-4.9/bin/aarch64-linux-android-
 	make O=out dtbo.img
 	BUILD_END=$(date +"%s")
