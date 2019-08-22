@@ -107,8 +107,8 @@ fi
 function clone {
 	echo " "
 	echo "★★Cloning GCC Toolchain from Android GoogleSource .."
-	git clone --depth 5 --no-single-branch https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9.git
-	git clone --depth 5 --no-single-branch https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9
+	git clone --progress -j32 --depth 5 --no-single-branch https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9.git
+	git clone --progress -j32 --depth 5 --no-single-branch https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9
 
 	#Workaround to remove deprecation spam of gcc
 	cd aarch64-linux-android-4.9
@@ -120,7 +120,7 @@ function clone {
 	echo "★★GCC cloning done"
 	echo ""
 	echo "★★Cloning Clang 8 sources"
-	git clone --depth 1 https://github.com/Panchajanya1999/clang-llvm.git -b 8.0
+	git clone --progress -j32 --depth 1 https://github.com/Panchajanya1999/clang-llvm.git -b 8.0
 	echo "★★Clang Done, Now Its time for AnyKernel .."
 	git clone --depth 1 --no-single-branch https://github.com/Panchajanya1999/AnyKernel2.git -b $ARG1
 	echo "★★Cloning libufdt"
@@ -142,6 +142,7 @@ function exports {
 	export PATH
 	export BOT_MSG_URL="https://api.telegram.org/bot$token/sendMessage"
 	export BOT_BUILD_URL="https://api.telegram.org/bot$token/sendDocument"
+	env_exports
 }
 
 ##---------------------------------------------------------##
@@ -166,24 +167,30 @@ function tg_post_build {
 
 ##----------------------------------------------------------##
 
+function env_exports {
+	export CROSS_COMPILE=$KERNEL_DIR/aarch64-linux-android-4.9/bin/aarch64-linux-android-
+	export CROSS_COMPILE_ARM32=$KERNEL_DIR/arm-linux-androideabi-4.9/bin/arm-linux-androideabi-
+	export CC=$KERNEL_DIR/clang-llvm/bin/clang
+	}
+
+##----------------------------------------------------------##
+
 function build_kernel {
 	if [ "$build_push" = true ]; then
 		tg_post_msg "<b>CI Build Triggered</b>%0A<b>Date : </b><code>$(TZ=Asia/Jakarta date)</code>%0A<b>Device : </b><code>$DEVICE</code>%0A<b>Pipeline Host : </b><code>CircleCI</code>%0A<b>Compiler Used : </b><code>$KBUILD_COMPILER_STRING</code>%0A<b>Status : </b>#Nightly" "$CHATID"
 	fi
 	make O=out $DEFCONFIG
 	BUILD_START=$(date +"%s")
-	#we need to define seperately because of vdso
-	export CROSS_COMPILE_ARM32=$KERNEL_DIR/arm-linux-androideabi-4.9/bin/arm-linux-androideabi-
 	make -j8 O=out \
-		CC=$KERNEL_DIR/clang-llvm/bin/clang \
-		CLANG_TRIPLE=aarch64-linux-gnu- \
-		CROSS_COMPILE=$KERNEL_DIR/aarch64-linux-android-4.9/bin/aarch64-linux-android- 2>&1 | tee error.log
-
-	#we need to define again for dtbo
-	export CROSS_COMPILE=$KERNEL_DIR/aarch64-linux-android-4.9/bin/aarch64-linux-android-
+		CROSS_COMPILE=$CROSS_COMPILE \
+		CROSS_COMPILE_ARM32=$CROSS_COMPILE_ARM32 \
+		CC=$CC \
+		CLANG_TRIPLE=aarch64-linux-gnu- 2>&1 | tee error.log
+	#make dtbo image
 	make O=out dtbo.img
 	BUILD_END=$(date +"%s")
 	DIFF=$((BUILD_END - BUILD_START))
+	check_img
 }
 
 ##-------------------------------------------------------------##
@@ -205,7 +212,6 @@ function gen_zip {
 	cd AnyKernel2
 	zip -r9 $ZIPNAME-$ARG1-$DATE * -x .git README.md
 	MD5CHECK=$(md5sum $ZIPNAME-$ARG1-$DATE.zip)
-	ZIP=$ZIPNAME*
 	tg_post_build $ZIPNAME* "$CHATID" "Build took : $((DIFF / 60)) minute(s) and $((DIFF % 60)) second(s)"
 	cd ..
 }
@@ -213,6 +219,5 @@ function gen_zip {
 clone
 exports
 build_kernel
-check_img
 
 ##----------------*****-----------------------------##
