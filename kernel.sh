@@ -211,7 +211,7 @@ function gen_zip {
 	mv $KERNEL_DIR/out/arch/arm64/boot/dtbo.img AnyKernel2/dtbo.img
 	cd AnyKernel2
 	zip -r9 $ZIPNAME-$ARG1-$DATE * -x .git README.md
-	MD5CHECK=$(md5sum $ZIPNAME-$ARG1-$DATE.zip)
+	MD5CHECK=$(md5sum $ZIPNAME-$ARG1-$DATE.zip | cut -d' ' -f1)
 	tg_post_build $ZIPNAME* "$CHATID" "Build took : $((DIFF / 60)) minute(s) and $((DIFF % 60)) second(s) | MD5 Checksum : <code>$MD5CHECK</code>"
 	cd ..
 }
