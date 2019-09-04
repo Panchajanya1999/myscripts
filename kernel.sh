@@ -26,6 +26,8 @@ ARG2=$2 #It is the make arguments, whether clean / dirty / def_regs [regenerates
 ARG3=$3 #Build should be pushed or not [PUSH / NOPUSH]
 DATE=$(TZ=Asia/Jakarta date +"%Y%m%d-%T")
 export ZIPNAME="azure" #Specifies the name of kernel
+#We should fetch the latest clang build from android_googlesource
+export CLANG_URL=https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/master/clang-r365631.tar.gz
 
 ##----------------------------------------------------##
 
@@ -120,7 +122,10 @@ function clone {
 	echo "★★GCC cloning done"
 	echo ""
 	echo "★★Cloning Clang 8 sources"
-	git clone --progress -j32 --depth 1 https://github.com/Panchajanya1999/clang-llvm.git -b 8.0
+	wget $CLANG_URL
+	mkdir clang-llvm
+	tar -C clang-llvm -xvf clang*.tar.gz
+	rm -rf clang*.tar.gz
 	echo "★★Clang Done, Now Its time for AnyKernel .."
 	git clone --depth 1 --no-single-branch https://github.com/Panchajanya1999/AnyKernel2.git -b $ARG1
 	echo "★★Cloning libufdt"
