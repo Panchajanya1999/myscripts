@@ -148,6 +148,7 @@ function exports {
 	export BOT_MSG_URL="https://api.telegram.org/bot$token/sendMessage"
 	export BOT_BUILD_URL="https://api.telegram.org/bot$token/sendDocument"
 	env_exports
+	export PROCS=$(nproc --all)
 }
 
 ##---------------------------------------------------------##
@@ -182,11 +183,11 @@ function env_exports {
 
 function build_kernel {
 	if [ "$build_push" = true ]; then
-		tg_post_msg "<b>CI Build Triggered</b>%0A<b>Date : </b><code>$(TZ=Asia/Jakarta date)</code>%0A<b>Device : </b><code>$DEVICE</code>%0A<b>Pipeline Host : </b><code>CircleCI</code>%0A<b>Compiler Used : </b><code>$KBUILD_COMPILER_STRING</code>%0A<b>Status : </b>#Nightly" "$CHATID"
+		tg_post_msg "<b>$CIRCLE_BUILD_NUM CI Build Triggered</b>%0A<b>Date : </b><code>$(TZ=Asia/Jakarta date)</code>%0A<b>Device : </b><code>$DEVICE</code>%0A<b>Pipeline Host : </b><code>CircleCI</code>%0A<b>Host Core Count : </b><code>$PROCS</code>%0A<b>Compiler Used : </b><code>$KBUILD_COMPILER_STRING</code>%0a<b>Branch : </b><code>$CIRCLE_BRANCH</code>%0A<b>Status : </b>#Nightly" "$CHATID"
 	fi
 	make O=out $DEFCONFIG
 	BUILD_START=$(date +"%s")
-	make -j8 O=out \
+	make -j$PROCS O=out \
 		CROSS_COMPILE=$CROSS_COMPILE \
 		CROSS_COMPILE_ARM32=$CROSS_COMPILE_ARM32 \
 		CC=$CC \
