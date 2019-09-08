@@ -24,7 +24,7 @@ KERNEL_DIR=$PWD
 ARG1=$1 #It is the devicename [generally codename]
 ARG2=$2 #It is the make arguments, whether clean / dirty / def_regs [regenerates defconfig]
 ARG3=$3 #Build should be pushed or not [PUSH / NOPUSH]
-DATE=$(TZ=Asia/Jakarta date +"%Y%m%d-%T")
+DATE=$(TZ=Asia/Jakarta date)
 export ZIPNAME="azure" #Specifies the name of kernel
 #We should fetch the latest clang build from android_googlesource
 export CLANG_URL=https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/master/clang-r365631.tar.gz
