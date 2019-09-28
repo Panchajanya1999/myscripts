@@ -1,0 +1,38 @@
+# Path of Kernel source
+# DIR=</your/path/of/kernel/source>
+
+# Path to clang toolchain
+# CLANG=</path/to/your/clang/toolchain>
+
+# Path to GCC toolchain
+# GCC=</path/to/your/GCC/toolchain>
+
+# Path to your GCC 32-bit (needed for 32-bit vDSO) only
+# GCC_32=</path/to/your/32-bit_GCC/toolchain>
+
+# Path to LD_LIBRARY_PATH, a colon-separated set of directories where libraries should be searched for first, before the standard set of directories; this is useful when debugging a new library or using a nonstandard library for special purposes.
+# LD_LIBRARY_PATH=$CLANG/lib64:$LD_LIBRARY_PATH>
+# export LD_LIBRARY_PATH
+
+# Setup PATH in build environment
+# PATH=$CLANG/bin/:$GCC/bin/:$PATH
+
+# You can use Telegram API to do stuffs like logging, sending message or just interacting. For that, uncomment the next line. 
+# source .bot-configs
+
+
+# <-----Device Specific Configurations----->
+
+function device {
+
+	# Device codename
+	DEVICE="violet"
+
+	# Linux Kernel version and patchlevel
+	LINUX_VERSION="4.14"
+
+	# Defconfig
+	DEFCONFIG=vendor/violet-perf_defconfig
+
+	# 
+}
