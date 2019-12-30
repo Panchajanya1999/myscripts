@@ -27,7 +27,7 @@ ARG3=$3 #Build should be pushed or not [PUSH / NOPUSH]
 DATE=$(TZ=Asia/Jakarta date +"%Y%m%d-%T")
 export ZIPNAME="azure" #Specifies the name of kernel
 #We should fetch the latest clang build from android_googlesource
-export CLANG_URL=https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/0d5571d773730462d70ef218f7296a7641ff7af0/clang-r365631b.tar.gz
+export CLANG_URL=https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/0d3a06b3f58c9093ec5b4fb9ebb3ad0ab2d2e489/clang-r370808.tar.gz
 
 ##----------------------------------------------------##
 
