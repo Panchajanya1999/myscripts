@@ -141,7 +141,7 @@ function exports {
 	export ARCH=arm64
 	export SUBARCH=arm64
 	export KBUILD_COMPILER_STRING=$($KERNEL_DIR/clang-llvm/bin/clang --version | head -n 1 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g' -e 's/[[:space:]]*$//')
-	LD_LIBRARY_PATH=$KERNEL_DIR/clang-llvm/lib64:$LD_LIBRARY_PATH
+	LD_LIBRARY_PATH=$KERNEL_DIR/clang-llvm/lib:$KERNEL_DIR/clang-llvm/lib64:$LD_LIBRARY_PATH
 	export LD_LIBRARY_PATH
 	PATH=$KERNEL_DIR/clang-llvm/bin/:$KERNEL_DIR/aarch64-linux-android-4.9/bin/:$PATH
 	export PATH
@@ -177,7 +177,12 @@ function env_exports {
 	export CROSS_COMPILE=$KERNEL_DIR/aarch64-linux-android-4.9/bin/aarch64-linux-android-
 	export CROSS_COMPILE_ARM32=$KERNEL_DIR/arm-linux-androideabi-4.9/bin/arm-linux-androideabi-
 	export CC=$KERNEL_DIR/clang-llvm/bin/clang
-	}
+	export AR=$KERNEL_DIR/clang-llvm/bin/llvm-ar
+	export NM=$KERNEL_DIR/clang-llvm/bin/llvm-nm
+	export OBJCOPY=$KERNEL_DIR/clang-llvm/bin/llvm-objcopy
+	export OBJDUMP=$KERNEL_DIR/clang-llvm/bin/llvm-objdump
+	export STRIP=$KERNEL_DIR/clang-llvm/bin/llvm-strip
+}
 
 ##----------------------------------------------------------##
 
@@ -191,8 +196,12 @@ function build_kernel {
 		CROSS_COMPILE=$CROSS_COMPILE \
 		CROSS_COMPILE_ARM32=$CROSS_COMPILE_ARM32 \
 		CC=$CC \
+		AR=$AR \
+		NM=$NM \
+		OBJCOPY=$OBJCOPY \
+		OBJDUMP=$OBJDUMP \
+		STRIP=$STRIP \
 		CLANG_TRIPLE=aarch64-linux-gnu- 2>&1 | tee error.log
-	#make dtbo image
 	make O=out dtbo.img
 	BUILD_END=$(date +"%s")
 	DIFF=$((BUILD_END - BUILD_START))
