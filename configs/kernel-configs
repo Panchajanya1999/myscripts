@@ -23,7 +23,7 @@
 
 # <-----Device Specific Configurations----->
 
-function device {
+device {
 
 	# Device codename
 	DEVICE="violet"
