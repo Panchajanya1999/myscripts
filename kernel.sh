@@ -59,6 +59,20 @@ DEF_REG=0
 # 1 is YES | 0 is NO(default)
 BUILD_DTBO=1
 
+# Sign the zipfile
+# 1 is YES | 0 is NO
+SIGN=1
+	if [ $SIGN == 1 ]
+	then
+			#Check java installed or not
+			JAVAEXEC="/usr/bin/java"
+			if [ ! -d $JAVAEXEC ]
+			then
+				# install java 8 via aptitude
+				apt-get -y install openjdk-8-jdk;
+			fi
+	fi
+
 # Check if we are using a dedicated CI ( Continuous Integration ), and
 # set KBUILD_BUILD_VERSION
 if [ $CI == true ]
@@ -144,7 +158,7 @@ function build_kernel {
 	fi
 
 	make O=out $DEFCONFIG
-	if [ $DEF_REG == 1]
+	if [ $DEF_REG == 1 ]
 	then
 		cp .config arch/arm64/configs/$DEFCONFIG
 		git add arch/arm64/configs/$DEFCONFIG
@@ -197,10 +211,22 @@ function gen_zip {
 	fi
 	cd AnyKernel2
 	zip -r9 $ZIPNAME-$DEVICE-$DATE * -x .git README.md
-	MD5CHECK=$(md5sum $ZIPNAME-$DEVICE-$DATE.zip | cut -d' ' -f1)
+
+	if [ $SIGN == 1 ]
+	then
+		## Sign the zip before sending it to telegram
+		if [ "$PTTG" == 1 ]
+ 		then
+ 			tg_post_msg "Signing Zip file with AOSP keys.." "$CHATID"
+ 		fi
+		curl -sLo zipsigner-3.0.jar https://raw.githubusercontent.com/baalajimaestro/AnyKernel2/master/zipsigner-3.0.jar
+		java -jar zipsigner-3.0.jar $ZIPNAME-$DEVICE-$DATE.zip $ZIPNAME-$DEVICE-$DATE-signed.zip
+	fi
+
+	MD5CHECK=$(md5sum $ZIPNAME-$DEVICE-$DATE-signed.zip | cut -d' ' -f1)
 	if [ "$PTTG" == 1 ]
  	then
-		tg_post_build $ZIPNAME* "$CHATID" "Build took : $((DIFF / 60)) minute(s) and $((DIFF % 60)) second(s) | MD5 Checksum : <code>$MD5CHECK</code>"
+		tg_post_build $ZIPNAME-$DEVICE-$DATE-signed.zip "$CHATID" "Build took : $((DIFF / 60)) minute(s) and $((DIFF % 60)) second(s) | MD5 Checksum : <code>$MD5CHECK</code>"
 	fi
 	cd ..
 }
