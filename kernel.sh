@@ -173,6 +173,7 @@ function build_kernel {
 		CC=clang \
 		AR=llvm-ar \
 		NM=llvm-nm \
+		LD=ld.lld \
 		OBJCOPY=llvm-objcopy \
 		OBJDUMP=llvm-objdump \
 		STRIP=llvm-strip 2>&1 | tee error.log
