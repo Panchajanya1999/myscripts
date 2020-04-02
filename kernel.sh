@@ -73,18 +73,28 @@ SIGN=1
 			fi
 	fi
 
+##------------------------------------------------------##
+##---------Do Not Touch Anything Beyond This------------##
+
 # Check if we are using a dedicated CI ( Continuous Integration ), and
-# set KBUILD_BUILD_VERSION
-if [ $CI == true ]
+# set KBUILD_BUILD_VERSION and KBUILD_BUILD_HOST and CI_BRANCH
+if [ -v $CI ]
 then
-	if [ $CIRCLECI == true ]
+	if [ -v $CIRCLECI ]
 	then
 		export KBUILD_BUILD_VERSION=$CIRCLE_BUILD_NUM
+		export KBUILD_BUILD_HOST="CircleCI"
+		export CI_BRANCH=$CIRCLE_BRANCH
+	if [ -v $DRONE ]
+	then
+		export KBUILD_BUILD_VERSION=$DRONE_BUILD_NUMBER
+		export KBUILD_BUILD_HOST=$DRONE_SYSTEM_HOST
+		export CI_BRANCH=$DRONE_BRANCH
+	else
+		echo "Not presetting Build Version"
 	fi
 fi
 
-##------------------------------------------------------##
-##---------Do Not Touch Anything Beyond This------------##
 
 # Set a commit head
 COMMIT_HEAD=$(git log --oneline -1)
@@ -113,7 +123,6 @@ function clone {
 
 function exports {
 	export KBUILD_BUILD_USER="panchajanya"
-	export KBUILD_BUILD_HOST="circleci"
 	export ARCH=arm64
 	export SUBARCH=arm64
 	export KBUILD_COMPILER_STRING=$($TC_DIR/bin/clang --version | head -n 1 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g' -e 's/[[:space:]]*$//')
@@ -154,7 +163,7 @@ function build_kernel {
 
 	if [ "$PTTG" == 1 ]
  	then
-		tg_post_msg "<b>$CIRCLE_BUILD_NUM CI Build Triggered</b>%0A<b>Date : </b><code>$(TZ=Asia/Jakarta date)</code>%0A<b>Device : </b><code>$MODEL [$DEVICE]</code>%0A<b>Pipeline Host : </b><code>CircleCI</code>%0A<b>Host Core Count : </b><code>$PROCS</code>%0A<b>Compiler Used : </b><code>$KBUILD_COMPILER_STRING</code>%0a<b>Branch : </b><code>$CIRCLE_BRANCH</code>%0A<b>Top Commit : </b><code>$COMMIT_HEAD</code>%0A<b>Status : </b>#Nightly" "$CHATID"
+		tg_post_msg "<b>$KBUILD_BUILD_VERSION CI Build Triggered</b>%0A<b>Date : </b><code>$(TZ=Asia/Jakarta date)</code>%0A<b>Device : </b><code>$MODEL [$DEVICE]</code>%0A<b>Pipeline Host : </b><code>$KBUILD_BUILD_HOST</code>%0A<b>Host Core Count : </b><code>$PROCS</code>%0A<b>Compiler Used : </b><code>$KBUILD_COMPILER_STRING</code>%0a<b>Branch : </b><code>$CI_BRANCH</code>%0A<b>Top Commit : </b><code>$COMMIT_HEAD</code>%0A<b>Status : </b>#Nightly" "$CHATID"
 	fi
 
 	make O=out $DEFCONFIG
