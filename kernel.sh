@@ -76,6 +76,12 @@ SIGN=1
 
 # Check if we are using a dedicated CI ( Continuous Integration ), and
 # set KBUILD_BUILD_VERSION and KBUILD_BUILD_HOST and CI_BRANCH
+
+## Set defaults first
+export KBUILD_BUILD_HOST=$(uname -a | awk '{print $2}')
+export CI_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+## Check for CI
 if [ ! -z "$CI" ]
 then
 	if [ ! -z "$CIRCLECI" ]
@@ -84,7 +90,7 @@ then
 		export KBUILD_BUILD_HOST="CircleCI"
 		export CI_BRANCH=$CIRCLE_BRANCH
 	fi
-	if [ -v "$DRONE" ]
+	if [ ! -z "$DRONE" ]
 	then
 		export KBUILD_BUILD_VERSION=$DRONE_BUILD_NUMBER
 		export KBUILD_BUILD_HOST=$DRONE_SYSTEM_HOST
