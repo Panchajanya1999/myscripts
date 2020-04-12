@@ -115,7 +115,7 @@ DATE=$(TZ=Asia/Jakarta date +"%Y%m%d-%T")
 function clone {
 	echo " "
 	echo "★★Cloning Azure Clang 11"
-	git clone --depth=1 https://github.com/Panchajanya1999/clang-llvm.git clang-llvm
+	git clone --depth=1 https://github.com/Panchajanya1999/azure-clang.git clang-llvm
 
 	# Toolchain Directory defaults to clang-llvm
 	TC_DIR=$PWD/clang-llvm
@@ -163,7 +163,7 @@ function tg_post_build {
 	-F chat_id="$2"  \
 	-F "disable_web_page_preview=true" \
 	-F "parse_mode=html" \
-	-F caption="$3%0A<b>MD5 Checksum : </b><code>$MD5CHECK</code>"  
+	-F caption="$3 | <b>MD5 Checksum : </b><code>$MD5CHECK</code>"  
 }
 
 ##----------------------------------------------------------##
