@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 
  # Script For Building Android arm64 Kernel
  #
@@ -39,6 +39,15 @@ DEVICE="violet"
 # your device or check source
 DEFCONFIG=vendor/violet-perf_defconfig
 
+# Specify compiler. 
+# 'clang' or 'gcc'
+COMPILER=gcc
+	if [ $COMPILER = "gcc" ]
+	then
+		# install few necessary packages
+		apt-get -y install llvm lld
+	fi
+
 # Clean source prior building. 1 is NO(default) | 0 is YES
 INCREMENTAL=1
 
@@ -78,19 +87,20 @@ SIGN=1
 # set KBUILD_BUILD_VERSION and KBUILD_BUILD_HOST and CI_BRANCH
 
 ## Set defaults first
-export KBUILD_BUILD_HOST=$(uname -a | awk '{print $2}')
-export CI_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+KBUILD_BUILD_HOST=$(uname -a | awk '{print $2}')
+CI_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+export KBUILD_BUILD_HOST CI_BRANCH
 
 ## Check for CI
-if [ ! -z "$CI" ]
+if [ -n "$CI" ]
 then
-	if [ ! -z "$CIRCLECI" ]
+	if [ -n "$CIRCLECI" ]
 	then
 		export KBUILD_BUILD_VERSION=$CIRCLE_BUILD_NUM
 		export KBUILD_BUILD_HOST="CircleCI"
 		export CI_BRANCH=$CIRCLE_BRANCH
 	fi
-	if [ ! -z "$DRONE" ]
+	if [ -n "$DRONE" ]
 	then
 		export KBUILD_BUILD_VERSION=$DRONE_BUILD_NUMBER
 		export KBUILD_BUILD_HOST=$DRONE_SYSTEM_HOST
@@ -112,15 +122,23 @@ DATE=$(TZ=Asia/Jakarta date +"%Y%m%d-%T")
 
 #Now Its time for other stuffs like cloning, exporting, etc
 
-function clone {
+ clone() {
 	echo " "
-	echo "★★Cloning Azure Clang 11"
-	git clone --depth=1 https://github.com/Panchajanya1999/azure-clang.git clang-llvm
+	if [ $COMPILER = "clang" ]
+	then
+		echo "★★Cloning Azure Clang 11"
+		git clone --depth=1 https://github.com/Panchajanya1999/azure-clang.git clang-llvm
+		# Toolchain Directory defaults to clang-llvm
+		TC_DIR=$KERNEL_DIR/clang-llvm
+	elif [ $COMPILER = "gcc" ]
+	then
+		git clone --depth=1 https://github.com/arter97/arm64-gcc.git gcc64
+		git clone --depth=1 https://github.com/arter97/arm32-gcc.git gcc32
+		GCC64_DIR=$KERNEL_DIR/gcc64
+		GCC32_DIR=$KERNEL_DIR/gcc32
+	fi
 
-	# Toolchain Directory defaults to clang-llvm
-	TC_DIR=$PWD/clang-llvm
-
-	echo "★★Clang Done, Now Its time for AnyKernel .."
+	echo "★★Toolchains Done, Now Its time for AnyKernel .."
 	git clone --depth 1 --no-single-branch https://github.com/Panchajanya1999/AnyKernel2.git -b $DEVICE
 	echo "★★Cloning libufdt"
 	git clone https://android.googlesource.com/platform/system/libufdt "$KERNEL_DIR"/scripts/ufdt/libufdt
@@ -129,22 +147,31 @@ function clone {
 
 ##------------------------------------------------------##
 
-function exports {
+exports() {
 	export KBUILD_BUILD_USER="panchajanya"
 	export ARCH=arm64
 	export SUBARCH=arm64
-	KBUILD_COMPILER_STRING=$("$TC_DIR"/bin/clang --version | head -n 1 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g' -e 's/[[:space:]]*$//')
-	export KBUILD_COMPILER_STRING
-	PATH=$TC_DIR/bin/:$PATH
-	export PATH
+
+	if [ $COMPILER = "clang" ]
+	then
+		KBUILD_COMPILER_STRING=$("$TC_DIR"/bin/clang --version | head -n 1 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g' -e 's/[[:space:]]*$//')
+		PATH=$TC_DIR/bin/:$PATH
+	elif [ $COMPILER = "gcc" ]
+	then
+		KBUILD_COMPILER_STRING=$("$GCC64_DIR"/bin/aarch64-elf-gcc --version | head -n 1)
+		PATH=$GCC64_DIR/bin/:$GCC32_DIR/bin/:/usr/bin:$PATH
+	fi
+
+	export PATH KBUILD_COMPILER_STRING
 	export BOT_MSG_URL="https://api.telegram.org/bot$token/sendMessage"
 	export BOT_BUILD_URL="https://api.telegram.org/bot$token/sendDocument"
-	export PROCS=$(nproc --all)
+	PROCS=$(nproc --all)
+	export PROCS
 }
 
 ##---------------------------------------------------------##
 
-function tg_post_msg {
+tg_post_msg() {
 	curl -s -X POST "$BOT_MSG_URL" -d chat_id="$2" \
 	-d "disable_web_page_preview=true" \
 	-d "parse_mode=html" \
@@ -154,7 +181,7 @@ function tg_post_msg {
 
 ##----------------------------------------------------------------##
 
-function tg_post_build {
+tg_post_build() {
 	#Post MD5Checksum alongwith for easeness
 	MD5CHECK=$(md5sum "$1" | cut -d' ' -f1)
 
@@ -168,7 +195,7 @@ function tg_post_build {
 
 ##----------------------------------------------------------##
 
-function build_kernel {
+build_kernel() {
 	if [ $INCREMENTAL = 0 ]
 	then
 		make clean && make mrproper && rm -rf out
@@ -190,17 +217,32 @@ function build_kernel {
 	fi
 
 	BUILD_START=$(date +"%s")
+	
+	if [ $COMPILER = "clang" ]
+	then
+		MAKE+=(
+			CROSS_COMPILE=aarch64-linux-gnu- \
+			CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
+			CC=clang \
+			AR=llvm-ar \
+			OBJDUMP=llvm-objdump \
+			STRIP=llvm-strip
+		)
+	elif [ $COMPILER = "gcc" ]
+	then
+		MAKE+=(
+			CROSS_COMPILE_ARM32=arm-eabi- \
+			CROSS_COMPILE=aarch64-elf- \
+			AR=aarch64-elf-ar \
+			OBJDUMP=aarch64-elf-objdump \
+			STRIP=aarch64-elf-strip
+		)
+	fi
 
 	make -j"$PROCS" O=out \
-		CROSS_COMPILE=aarch64-linux-gnu- \
-		CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
-		CC=clang \
-		AR=llvm-ar \
 		NM=llvm-nm \
-		LD=ld.lld \
 		OBJCOPY=llvm-objcopy \
-		OBJDUMP=llvm-objdump \
-		STRIP=llvm-strip 2>&1 | tee error.log
+		LD=ld.lld "${MAKE[@]}" 2>&1 | tee error.log
 
 		BUILD_END=$(date +"%s")
 		DIFF=$((BUILD_END - BUILD_START))
@@ -225,7 +267,7 @@ function build_kernel {
 
 ##--------------------------------------------------------------##
 
-function gen_zip {
+gen_zip() {
 	mv "$KERNEL_DIR"/out/arch/arm64/boot/Image.gz-dtb AnyKernel2/Image.gz-dtb
 	if [ $BUILD_DTBO = 1 ]
 	then
@@ -235,7 +277,7 @@ function gen_zip {
 	zip -r9 $ZIPNAME-$DEVICE-"$DATE" * -x .git README.md
 
 	## Prepare a final zip variable
-	ZIP_FINAL="$ZIPNAME-$DEVICE-"$DATE".zip"
+	ZIP_FINAL="$ZIPNAME-$DEVICE-$DATE.zip"
 
 	if [ $SIGN = 1 ]
 	then
@@ -245,13 +287,13 @@ function gen_zip {
  			tg_post_msg "<code>Signing Zip file with AOSP keys..</code>" "$CHATID"
  		fi
 		curl -sLo zipsigner-3.0.jar https://raw.githubusercontent.com/baalajimaestro/AnyKernel2/master/zipsigner-3.0.jar
-		java -jar zipsigner-3.0.jar $ZIPNAME-$DEVICE-"$DATE".zip $ZIP_FINAL-signed.zip
+		java -jar zipsigner-3.0.jar $ZIPNAME-$DEVICE-"$DATE".zip "$ZIP_FINAL"-signed.zip
 		ZIP_FINAL="$ZIP_FINAL-signed.zip"
 	fi
 
 	if [ "$PTTG" = 1 ]
  	then
-		tg_post_build $ZIP_FINAL "$CHATID" "Build took : $((DIFF / 60)) minute(s) and $((DIFF % 60)) second(s)"
+		tg_post_build "$ZIP_FINAL" "$CHATID" "Build took : $((DIFF / 60)) minute(s) and $((DIFF % 60)) second(s)"
 	fi
 	cd ..
 }
