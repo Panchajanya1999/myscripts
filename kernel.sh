@@ -51,14 +51,6 @@ DEFCONFIG=vendor/violet-perf_defconfig
 # Specify compiler. 
 # 'clang' or 'gcc'
 COMPILER=gcc
-	if [ $COMPILER = "gcc" ]
-	then
-		# Check if lld and llvm-objcopy installed or not
-		if [[ ! -d /usr/bin/lld && ! -d /usr/bin/llvm-objcopy ]]
-		then
-			err "lld and objcopy is not installed!! Install lld and llvm and re-run script!!"
-		fi
-	fi
 
 # Clean source prior building. 1 is NO(default) | 0 is YES
 INCREMENTAL=1
@@ -81,15 +73,6 @@ BUILD_DTBO=1
 # Sign the zipfile
 # 1 is YES | 0 is NO
 SIGN=1
-	if [ $SIGN = 1 ]
-	then
-			#Check java installed or not
-			JAVAEXEC="/usr/bin/java"
-			if [ ! -d $JAVAEXEC ]
-			then
-				err "JAVA is not installed!! Install JAVA 1.8 and re-run script!!"
-			fi
-	fi
 
 ##------------------------------------------------------##
 ##---------Do Not Touch Anything Beyond This------------##
