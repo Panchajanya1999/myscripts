@@ -19,6 +19,15 @@
 
 #Kernel building script
 
+# Function to show an informational message
+msg() {
+    echo -e "\e[1;32m$*\e[0m"
+}
+
+err() {
+    echo -e "\e[1;41m$*\e[0m"
+    exit 1
+}
 
 ##------------------------------------------------------##
 ##----------Basic Informations, COMPULSORY--------------##
@@ -44,8 +53,11 @@ DEFCONFIG=vendor/violet-perf_defconfig
 COMPILER=gcc
 	if [ $COMPILER = "gcc" ]
 	then
-		# install few necessary packages
-		apt-get -y install llvm lld
+		# Check if lld and llvm-objcopy installed or not
+		if [[ ! -d /usr/bin/lld && ! -d /usr/bin/llvm-objcopy ]]
+		then
+			err "lld and objcopy is not installed!! Install lld and llvm and re-run script!!"
+		fi
 	fi
 
 # Clean source prior building. 1 is NO(default) | 0 is YES
@@ -75,8 +87,7 @@ SIGN=1
 			JAVAEXEC="/usr/bin/java"
 			if [ ! -d $JAVAEXEC ]
 			then
-				# install java 8 via aptitude
-				apt-get -y install openjdk-8-jdk;
+				err "JAVA is not installed!! Install JAVA 1.8 and re-run script!!"
 			fi
 	fi
 
@@ -126,23 +137,24 @@ DATE=$(TZ=Asia/Jakarta date +"%Y%m%d-%T")
 	echo " "
 	if [ $COMPILER = "clang" ]
 	then
-		echo "★★Cloning Azure Clang 11"
+		msg "|| Cloning Clang-11 ||"
 		git clone --depth=1 https://github.com/Panchajanya1999/azure-clang.git clang-llvm
+
 		# Toolchain Directory defaults to clang-llvm
 		TC_DIR=$KERNEL_DIR/clang-llvm
 	elif [ $COMPILER = "gcc" ]
 	then
+		msg "|| Cloning GCC 9.3.0 baremetal ||"
 		git clone --depth=1 https://github.com/arter97/arm64-gcc.git gcc64
 		git clone --depth=1 https://github.com/arter97/arm32-gcc.git gcc32
 		GCC64_DIR=$KERNEL_DIR/gcc64
 		GCC32_DIR=$KERNEL_DIR/gcc32
 	fi
 
-	echo "★★Toolchains Done, Now Its time for AnyKernel .."
+	msg "|| Cloning Anykernel ||"
 	git clone --depth 1 --no-single-branch https://github.com/Panchajanya1999/AnyKernel2.git -b $DEVICE
-	echo "★★Cloning libufdt"
+	msg "|| Cloning libufdt ||"
 	git clone https://android.googlesource.com/platform/system/libufdt "$KERNEL_DIR"/scripts/ufdt/libufdt
-	echo "★★Cloning Kinda Done..!!!"
 }
 
 ##------------------------------------------------------##
@@ -198,6 +210,7 @@ tg_post_build() {
 build_kernel() {
 	if [ $INCREMENTAL = 0 ]
 	then
+		msg "|| Cleaning Sources ||"
 		make clean && make mrproper && rm -rf out
 	fi
 
@@ -239,6 +252,7 @@ build_kernel() {
 		)
 	fi
 
+	msg "|| Started Compilation ||"
 	make -j"$PROCS" O=out \
 		NM=llvm-nm \
 		OBJCOPY=llvm-objcopy \
@@ -249,8 +263,10 @@ build_kernel() {
 
 		if [ -f "$KERNEL_DIR"/out/arch/arm64/boot/Image.gz-dtb ] 
 	    then
+	    	msg "|| Kernel successfully compiled ||"
 	    	if [ $BUILD_DTBO = 1 ]
 			then
+				msg "|| Building DTBO ||"
 				tg_post_msg "<code>Building DTBO..</code>" "$CHATID"
 				python2 "$KERNEL_DIR/scripts/ufdt/libufdt/utils/src/mkdtboimg.py" \
 					create "$KERNEL_DIR/out/arch/arm64/boot/dtbo.img" --page_size=4096 "$KERNEL_DIR/out/arch/arm64/boot/dts/qcom/sm6150-idp-overlay.dtbo"
@@ -268,6 +284,7 @@ build_kernel() {
 ##--------------------------------------------------------------##
 
 gen_zip() {
+	msg "|| Zipping into a flashable zip ||"
 	mv "$KERNEL_DIR"/out/arch/arm64/boot/Image.gz-dtb AnyKernel2/Image.gz-dtb
 	if [ $BUILD_DTBO = 1 ]
 	then
@@ -284,6 +301,7 @@ gen_zip() {
 		## Sign the zip before sending it to telegram
 		if [ "$PTTG" = 1 ]
  		then
+ 			msg "|| Signing Zip ||"
  			tg_post_msg "<code>Signing Zip file with AOSP keys..</code>" "$CHATID"
  		fi
 		curl -sLo zipsigner-3.0.jar https://raw.githubusercontent.com/baalajimaestro/AnyKernel2/master/zipsigner-3.0.jar
