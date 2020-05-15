@@ -74,6 +74,14 @@ BUILD_DTBO=1
 # 1 is YES | 0 is NO
 SIGN=1
 
+# Silence the compilation
+# 1 is YES(default) | 0 is NO
+SILENCE=0
+
+# Debug purpose. Send logs on every successfull builds
+# 1 is YES | 0 is NO(default)
+LOG_DEBUG=0
+
 ##------------------------------------------------------##
 ##---------Do Not Touch Anything Beyond This------------##
 
@@ -235,6 +243,11 @@ build_kernel() {
 			STRIP=aarch64-elf-strip
 		)
 	fi
+	
+	if [ $SILENCE = "1" ]
+	then
+		MAKE+=( -s )
+	fi
 
 	msg "|| Started Compilation ||"
 	make -j"$PROCS" O=out \
@@ -303,5 +316,10 @@ gen_zip() {
 clone
 exports
 build_kernel
+
+if [ $LOG_DEBUG = "1" ]
+then
+	tg_post_build "error.log" "$CHATID" "Debug Mode Logs"
+fi
 
 ##----------------*****-----------------------------##
