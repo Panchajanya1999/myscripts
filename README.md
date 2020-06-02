@@ -6,8 +6,8 @@
 **Features of this script :**
   ~~~
   1. Device Specific Configuration
-  2. Fetching the most needed stuffs like Toolchains(clang, gcc-arm64-4.9, gcc-arm-4.9) and Flasher(AnyKernel)(Device Specific)
-  3. Signs the ZipFile
+  2. Fetching the most needed stuffs like Toolchains(clang, gcc-arm64-9.3(baremetal), gcc-arm-9.3) and Flasher(AnyKernel)(Device Specific)
+  3. Signs the ZipFile [AOSP Keys]
   4. Builds required embedded DTBO
   5. Integrate with Telegram
   6. Notifies when compilation starts with some useful informations
@@ -70,12 +70,28 @@
         			 1 - Yes, sign the ZIP
         			 0 - No, thanks.
 
+        SILENCE	   - It literally silences the compilation output. Only warnings / errors
+        			 are shown on ouput stream (terminal). It is useful to catch warnings
+        			 easily.
+
+        			 1 - Yes, silence the compilation
+        			 0 - No, do not do that (default)
+
+        LOG_DEBUG  - Debugging purpose. Sends the compilation log on each run. Mostly needed
+        			 for monitoring(fixing warnings and errors) when cross-compiled.
+
+        			 1 - Yes. [self-explanatory]
+        			 0 - No. [self-explanatory]
+
           
   2. You should take care of the AnyKernel repository the script is cloning. You should have
      a working AnyKernel, setup for your device on a branch which is named the codename of your 
      device or DEVICE. Else you are pretty fucked up. I dont care if you fuck up here
 
   3. After you finish setting up the script as per your requirements, run this in your local
-          source kernel.sh
+          bash kernel.sh
+
+     Or, if u forked it and already completed setup as per your requirement, u can simply
+     	  curl https://raw.githubusercontent.com/<YOUR_GITHUB_USERNAME>/myscripts/master/kernel.sh | bash
           
 ```
