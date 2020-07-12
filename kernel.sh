@@ -137,7 +137,10 @@ DATE=$(TZ=Asia/Jakarta date +"%Y%m%d-%T")
 	elif [ $COMPILER = "gcc" ]
 	then
 		msg "|| Cloning GCC 9.3.0 baremetal ||"
-		git clone --depth=1 https://github.com/arter97/arm64-gcc.git gcc64
+		git clone --depth=50 https://github.com/arter97/arm64-gcc.git gcc64
+		cd gcc64 || exit
+		git reset --hard 811a3bc6b40ad924cd1a24a481b6ac5d9227ff7e
+		cd $KERNEL_DIR || exit
 		git clone --depth=1 https://github.com/arter97/arm32-gcc.git gcc32
 		GCC64_DIR=$KERNEL_DIR/gcc64
 		GCC32_DIR=$KERNEL_DIR/gcc32
