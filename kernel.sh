@@ -89,7 +89,7 @@ LOG_DEBUG=0
 # set KBUILD_BUILD_VERSION and KBUILD_BUILD_HOST and CI_BRANCH
 
 ## Set defaults first
-DISTRO=$(cat /etc/*-release | head -n 1 | cut -b 7- | sed s/.$//)
+DISTRO=$(cat /etc/issue)
 KBUILD_BUILD_HOST=$(uname -a | awk '{print $2}')
 CI_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 export KBUILD_BUILD_HOST CI_BRANCH
