@@ -36,7 +36,7 @@ err() {
 KERNEL_DIR=$PWD
 
 # The name of the Kernel, to name the ZIP
-ZIPNAME="azure"
+ZIPNAME="azure-dtbo"
 
 # The name of the device for which the kernel is built
 MODEL="Redmi Note 7 Pro"
