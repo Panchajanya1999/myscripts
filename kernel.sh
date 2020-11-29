@@ -259,7 +259,7 @@ build_kernel() {
 	fi
 
 	msg "|| Started Compilation ||"
-	make -j"$PROCS" O=out \
+	make -kj"$PROCS" O=out \
 		NM=llvm-nm \
 		OBJCOPY=llvm-objcopy \
 		LD=$LINKER "${MAKE[@]}" 2>&1 | tee error.log
