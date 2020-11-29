@@ -131,7 +131,7 @@ DATE=$(TZ=Asia/Jakarta date +"%Y%m%d-%T")
 	echo " "
 	if [ $COMPILER = "clang" ]
 	then
-		msg "|| Cloning Clang-11 ||"
+		msg "|| Cloning Clang-12 ||"
 		git clone --depth=1 https://github.com/Panchajanya1999/azure-clang.git clang-llvm
 
 		# Toolchain Directory defaults to clang-llvm
