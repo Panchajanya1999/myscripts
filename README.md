@@ -65,23 +65,23 @@
                      0 - No, thanks
 
         SIGN 	   - It sign the ZIP with AOSP Sign Keys for Package Signature verfication in 
-        			 custom recoveries. 
+	             custom recoveries. 
 
-        			 1 - Yes, sign the ZIP
-        			 0 - No, thanks.
+		     1 - Yes, sign the ZIP
+	             0 - No, thanks.
 
         SILENCE	   - It literally silences the compilation output. Only warnings / errors
-        			 are shown on ouput stream (terminal). It is useful to catch warnings
-        			 easily.
+                     are shown on ouput stream (terminal). It is useful to catch warnings
+	             easily.
 
-        			 1 - Yes, silence the compilation
-        			 0 - No, do not do that (default)
+                     1 - Yes, silence the compilation
+	             0 - No, do not do that (default)
 
         LOG_DEBUG  - Debugging purpose. Sends the compilation log on each run. Mostly needed
-        			 for monitoring(fixing warnings and errors) when cross-compiled.
+	             for monitoring(fixing warnings and errors) when cross-compiled.
 
-        			 1 - Yes. [self-explanatory]
-        			 0 - No. [self-explanatory]
+	             1 - Yes. [self-explanatory]
+	             0 - No. [self-explanatory]
 
           
   2. You should take care of the AnyKernel repository the script is cloning. You should have
