@@ -21,7 +21,9 @@
 
 # Function to show an informational message
 msg() {
+	clear
     echo -e "\e[1;32m$*\e[0m"
+	echo
 }
 
 err() {
