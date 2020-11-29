@@ -291,7 +291,7 @@ gen_zip() {
 		mv "$KERNEL_DIR"/out/arch/arm64/boot/dtbo.img AnyKernel2/dtbo.img
 	fi
 	cd AnyKernel2 || exit
-	zip -r9 $ZIPNAME-$DEVICE-"$DATE" * -x .git README.md
+	zip -r9 $ZIPNAME-$DEVICE-"$DATE" * -x .git README.md *.zip
 
 	## Prepare a final zip variable
 	ZIP_FINAL="$ZIPNAME-$DEVICE-$DATE.zip"
