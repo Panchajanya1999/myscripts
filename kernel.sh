@@ -30,6 +30,11 @@ err() {
     exit 1
 }
 
+cdir() {
+	cd $1 2>/dev/null || \
+		{ err "The directory $1 doesn't exists !" }
+}
+
 ##------------------------------------------------------##
 ##----------Basic Informations, COMPULSORY--------------##
 
@@ -142,9 +147,9 @@ DATE=$(TZ=Asia/Jakarta date +"%Y%m%d-%T")
 	then
 		msg "|| Cloning GCC 9.3.0 baremetal ||"
 		git clone --depth=50 https://github.com/arter97/arm64-gcc.git gcc64
-		cd gcc64 || exit
+		cdir gcc64
 		git reset --hard 811a3bc6b40ad924cd1a24a481b6ac5d9227ff7e
-		cd $KERNEL_DIR || exit
+		cdir $KERNEL_DIR
 		git clone --depth=1 https://github.com/arter97/arm32-gcc.git gcc32
 		GCC64_DIR=$KERNEL_DIR/gcc64
 		GCC32_DIR=$KERNEL_DIR/gcc32
@@ -296,7 +301,7 @@ gen_zip() {
 	then
 		mv "$KERNEL_DIR"/out/arch/arm64/boot/dtbo.img AnyKernel2/dtbo.img
 	fi
-	cd AnyKernel2 || exit
+	cdir AnyKernel2
 	zip -r9 $ZIPNAME-$DEVICE-"$DATE" * -x .git README.md *.zip
 
 	## Prepare a final zip variable
