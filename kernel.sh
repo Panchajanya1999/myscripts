@@ -159,9 +159,9 @@ DATE=$(TZ=Asia/Jakarta date +"%Y%m%d-%T")
 ##------------------------------------------------------##
 
 exports() {
-	export KBUILD_BUILD_USER="panchajanya"
-	export ARCH=arm64
-	export SUBARCH=arm64
+	KBUILD_BUILD_USER="panchajanya"
+	ARCH=arm64
+	SUBARCH=arm64
 
 	if [ $COMPILER = "clang" ]
 	then
@@ -173,11 +173,13 @@ exports() {
 		PATH=$TC_DIR/bin/:$GCC64_DIR/bin/:$GCC32_DIR/bin/:/usr/bin:$PATH
 	fi
 
-	export PATH KBUILD_COMPILER_STRING
-	export BOT_MSG_URL="https://api.telegram.org/bot$token/sendMessage"
-	export BOT_BUILD_URL="https://api.telegram.org/bot$token/sendDocument"
+	BOT_MSG_URL="https://api.telegram.org/bot$token/sendMessage"
+	BOT_BUILD_URL="https://api.telegram.org/bot$token/sendDocument"
 	PROCS=$(nproc --all)
-	export PROCS
+
+	export KBUILD_BUILD_USER ARCH SUBARCH PATH \
+		KBUILD_COMPILER_STRING BOT_MSG_URL \
+		BOT_BUILD_URL PROCS
 }
 
 ##---------------------------------------------------------##
