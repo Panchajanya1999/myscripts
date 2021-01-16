@@ -2,7 +2,7 @@
 
  # Script For Building Android arm64 Kernel
  #
- # Copyright (c) 2018-2020 Panchajanya1999 <rsk52959@gmail.com>
+ # Copyright (c) 2018-2021 Panchajanya1999 <rsk52959@gmail.com>
  #
  # Licensed under the Apache License, Version 2.0 (the "License");
  # you may not use this file except in compliance with the License.
@@ -302,10 +302,10 @@ gen_zip() {
 		mv "$KERNEL_DIR"/out/arch/arm64/boot/dtbo.img AnyKernel2/dtbo.img
 	fi
 	cdir AnyKernel2
-	zip -r9 $ZIPNAME-$DEVICE-"$DATE" * -x .git README.md *.zip
+	zip -r9 $ZIPNAME-$DEVICE-$DATE * -x .git README.md *.zip
 
 	## Prepare a final zip variable
-	ZIP_FINAL="$ZIPNAME-$DEVICE-$DATE.zip"
+	ZIP_FINAL="$ZIPNAME-$DEVICE-$DATE"
 
 	if [ $SIGN = 1 ]
 	then
@@ -316,13 +316,13 @@ gen_zip() {
 			tg_post_msg "<code>Signing Zip file with AOSP keys..</code>"
  		fi
 		curl -sLo zipsigner-3.0.jar https://raw.githubusercontent.com/baalajimaestro/AnyKernel2/master/zipsigner-3.0.jar
-		java -jar zipsigner-3.0.jar $ZIPNAME-$DEVICE-"$DATE".zip "$ZIP_FINAL"-signed.zip
-		ZIP_FINAL="$ZIP_FINAL-signed.zip"
+		java -jar zipsigner-3.0.jar $ZIP_FINAL.zip "$ZIP_FINAL"-signed.zip
+		ZIP_FINAL="$ZIP_FINAL-signed"
 	fi
 
 	if [ "$PTTG" = 1 ]
  	then
-		tg_post_build "$ZIP_FINAL" "Build took : $((DIFF / 60)) minute(s) and $((DIFF % 60)) second(s)"
+		tg_post_build "$ZIP_FINAL.zip" "Build took : $((DIFF / 60)) minute(s) and $((DIFF % 60)) second(s)"
 	fi
 	cd ..
 }
