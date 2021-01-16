@@ -268,9 +268,9 @@ build_kernel() {
 		DIFF=$((BUILD_END - BUILD_START))
 
 		if [ -f "$KERNEL_DIR"/out/arch/arm64/boot/Image.gz-dtb ] 
-	    then
-	    	msg "|| Kernel successfully compiled ||"
-	    	if [ $BUILD_DTBO = 1 ]
+		then
+			msg "|| Kernel successfully compiled ||"
+			if [ $BUILD_DTBO = 1 ]
 			then
 				msg "|| Building DTBO ||"
 				tg_post_msg "<code>Building DTBO..</code>"
@@ -278,7 +278,7 @@ build_kernel() {
 					create "$KERNEL_DIR/out/arch/arm64/boot/dtbo.img" --page_size=4096 "$KERNEL_DIR/out/arch/arm64/boot/dts/qcom/sm6150-idp-overlay.dtbo"
 			fi
 				gen_zip
-		else
+			else
 			if [ "$PTTG" = 1 ]
  			then
 				tg_post_build "error.log" "<b>Build failed to compile after $((DIFF / 60)) minute(s) and $((DIFF % 60)) seconds</b>"
