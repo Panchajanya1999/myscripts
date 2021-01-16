@@ -133,14 +133,12 @@ DATE=$(TZ=Asia/Jakarta date +"%Y%m%d-%T")
 
  clone() {
 	echo " "
-	if [ $COMPILER = "clang" ]
-	then
-		msg "|| Cloning Clang-12 ||"
-		git clone --depth=1 https://github.com/Panchajanya1999/azure-clang.git clang-llvm
+	msg "|| Cloning Clang-12 ||"
+	git clone --depth=1 https://github.com/Panchajanya1999/azure-clang.git clang-llvm
+	# Toolchain Directory defaults to clang-llvm
+	TC_DIR=$KERNEL_DIR/clang-llvm
 
-		# Toolchain Directory defaults to clang-llvm
-		TC_DIR=$KERNEL_DIR/clang-llvm
-	elif [ $COMPILER = "gcc" ]
+	if [ $COMPILER = "gcc" ]
 	then
 		msg "|| Cloning GCC 9.3.0 baremetal ||"
 		git clone --depth=50 https://github.com/arter97/arm64-gcc.git gcc64
@@ -172,7 +170,7 @@ exports() {
 	elif [ $COMPILER = "gcc" ]
 	then
 		KBUILD_COMPILER_STRING=$("$GCC64_DIR"/bin/aarch64-elf-gcc --version | head -n 1)
-		PATH=$GCC64_DIR/bin/:$GCC32_DIR/bin/:/usr/bin:$PATH
+		PATH=$TC_DIR/bin/:$GCC64_DIR/bin/:$GCC32_DIR/bin/:/usr/bin:$PATH
 	fi
 
 	export PATH KBUILD_COMPILER_STRING
