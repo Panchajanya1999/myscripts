@@ -42,7 +42,7 @@ cdir() {
 KERNEL_DIR=$PWD
 
 # The name of the Kernel, to name the ZIP
-ZIPNAME="azure-dtbo"
+ZIPNAME="azure"
 
 # The name of the device for which the kernel is built
 MODEL="Redmi Note 7 Pro"
