@@ -31,8 +31,8 @@ err() {
 }
 
 cdir() {
-	cd $1 2>/dev/null || \
-		{ err "The directory $1 doesn't exists !" }
+	cd "$1" 2>/dev/null || \
+		err "The directory $1 doesn't exists !"
 }
 
 ##------------------------------------------------------##
@@ -155,7 +155,7 @@ DATE=$(TZ=Asia/Jakarta date +"%Y%m%d-%T")
 		git clone --depth=50 https://github.com/arter97/arm64-gcc.git gcc64
 		cdir gcc64
 		git reset --hard 811a3bc6b40ad924cd1a24a481b6ac5d9227ff7e
-		cdir $KERNEL_DIR
+		cdir "$KERNEL_DIR"
 		git clone --depth=1 https://github.com/arter97/arm32-gcc.git gcc32
 		GCC64_DIR=$KERNEL_DIR/gcc64
 		GCC32_DIR=$KERNEL_DIR/gcc32
@@ -308,7 +308,7 @@ gen_zip() {
 		mv "$KERNEL_DIR"/out/arch/arm64/boot/dtbo.img AnyKernel2/dtbo.img
 	fi
 	cdir AnyKernel2
-	zip -r9 $ZIPNAME-$DEVICE-$DATE * -x .git README.md *.zip
+	zip -r9 $ZIPNAME-$DEVICE-"$DATE" * -x .git README.md *.zip
 
 	## Prepare a final zip variable
 	ZIP_FINAL="$ZIPNAME-$DEVICE-$DATE"
@@ -322,7 +322,7 @@ gen_zip() {
 			tg_post_msg "<code>Signing Zip file with AOSP keys..</code>"
  		fi
 		curl -sLo zipsigner-3.0.jar https://raw.githubusercontent.com/baalajimaestro/AnyKernel2/master/zipsigner-3.0.jar
-		java -jar zipsigner-3.0.jar $ZIP_FINAL.zip "$ZIP_FINAL"-signed.zip
+		java -jar zipsigner-3.0.jar "$ZIP_FINAL".zip "$ZIP_FINAL"-signed.zip
 		ZIP_FINAL="$ZIP_FINAL-signed"
 	fi
 
