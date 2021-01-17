@@ -302,12 +302,12 @@ build_kernel() {
 
 gen_zip() {
 	msg "|| Zipping into a flashable zip ||"
-	mv "$KERNEL_DIR"/out/arch/arm64/boot/Image.gz-dtb AnyKernel2/Image.gz-dtb
+	mv "$KERNEL_DIR"/out/arch/arm64/boot/Image.gz-dtb AnyKernel3/Image.gz-dtb
 	if [ $BUILD_DTBO = 1 ]
 	then
-		mv "$KERNEL_DIR"/out/arch/arm64/boot/dtbo.img AnyKernel2/dtbo.img
+		mv "$KERNEL_DIR"/out/arch/arm64/boot/dtbo.img AnyKernel3/dtbo.img
 	fi
-	cdir AnyKernel2
+	cdir AnyKernel3
 	zip -r9 $ZIPNAME-$DEVICE-"$DATE" * -x .git README.md *.zip
 
 	## Prepare a final zip variable
