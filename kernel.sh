@@ -89,6 +89,15 @@ BUILD_DTBO=1
 # Sign the zipfile
 # 1 is YES | 0 is NO
 SIGN=1
+	if [ $SIGN = 1 ]
+	then
+		#Check for java
+		if command -v java > /dev/null 2>&1; then
+			SIGN=1
+		else
+			SIGN=0
+		fi
+	fi
 
 # Silence the compilation
 # 1 is YES(default) | 0 is NO
