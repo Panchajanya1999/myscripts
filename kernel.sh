@@ -21,6 +21,7 @@
 
 # Function to show an informational message
 msg() {
+	echo
     echo -e "\e[1;32m$*\e[0m"
     echo
 }
@@ -153,7 +154,7 @@ DATE=$(TZ=Asia/Jakarta date +"%Y%m%d-%T")
 
  clone() {
 	echo " "
-	msg "|| Cloning Clang-12 ||"
+	msg "|| Cloning Clang-13 ||"
 	git clone --depth=1 https://github.com/kdrag0n/proton-clang.git clang-llvm
 	# Toolchain Directory defaults to clang-llvm
 	TC_DIR=$KERNEL_DIR/clang-llvm
