@@ -1,4 +1,5 @@
 #! /bin/bash
+# shellcheck disable=SC2154
 
  # Script For Building Android arm64 Kernel
  #
@@ -40,10 +41,18 @@ cdir() {
 ##----------Basic Informations, COMPULSORY--------------##
 
 # The defult directory where the kernel should be placed
-KERNEL_DIR=$PWD
+KERNEL_DIR="$(pwd)"
+BASEDIR="$(basename "$KERNEL_DIR")"
 
 # The name of the Kernel, to name the ZIP
 ZIPNAME="azure"
+
+# Build Author
+# Take care, it should be a universal and most probably, case-sensitive
+AUTHOR="Panchajanya1999"
+
+# Architecture
+ARCH=arm64
 
 # The name of the device for which the kernel is built
 MODEL="Redmi Note 7 Pro"
@@ -122,19 +131,21 @@ TERM=xterm
 export KBUILD_BUILD_HOST CI_BRANCH TERM
 
 ## Check for CI
-if [ -n "$CI" ]
+if [ "$CI" ]
 then
-	if [ -n "$CIRCLECI" ]
+	if [ "$CIRCLECI" ]
 	then
 		export KBUILD_BUILD_VERSION=$CIRCLE_BUILD_NUM
 		export KBUILD_BUILD_HOST="CircleCI"
 		export CI_BRANCH=$CIRCLE_BRANCH
 	fi
-	if [ -n "$DRONE" ]
+	if [ "$DRONE" ]
 	then
 		export KBUILD_BUILD_VERSION=$DRONE_BUILD_NUMBER
 		export KBUILD_BUILD_HOST=$DRONE_SYSTEM_HOST
 		export CI_BRANCH=$DRONE_BRANCH
+		export BASEDIR=$DRONE_REPO_NAME # overriding
+		export SERVER_URL="${DRONE_SYSTEM_PROTO}://${DRONE_SYSTEM_HOSTNAME}/${AUTHOR}/${BASEDIR}/${KBUILD_BUILD_VERSION}"
 	else
 		echo "Not presetting Build Version"
 	fi
@@ -172,7 +183,7 @@ DATE=$(TZ=Asia/Jakarta date +"%Y%m%d-%T")
 	fi
 
 	msg "|| Cloning Anykernel ||"
-	git clone --depth 1 --no-single-branch https://github.com/Panchajanya1999/AnyKernel3.git
+	git clone --depth 1 --no-single-branch https://github.com/"$AUTHOR"/AnyKernel3.git
 	msg "|| Cloning libufdt ||"
 	git clone https://android.googlesource.com/platform/system/libufdt "$KERNEL_DIR"/scripts/ufdt/libufdt
 }
@@ -180,9 +191,8 @@ DATE=$(TZ=Asia/Jakarta date +"%Y%m%d-%T")
 ##------------------------------------------------------##
 
 exports() {
-	KBUILD_BUILD_USER="panchajanya"
-	ARCH=arm64
-	SUBARCH=arm64
+	KBUILD_BUILD_USER=$AUTHOR
+	SUBARCH=$ARCH
 
 	if [ $COMPILER = "clang" ]
 	then
@@ -238,7 +248,7 @@ build_kernel() {
 
 	if [ "$PTTG" = 1 ]
  	then
-		tg_post_msg "<b>$KBUILD_BUILD_VERSION CI Build Triggered</b>%0A<b>Docker OS: </b><code>$DISTRO</code>%0A<b>Kernel Version : </b><code>$KERVER</code>%0A<b>Date : </b><code>$(TZ=Asia/Jakarta date)</code>%0A<b>Device : </b><code>$MODEL [$DEVICE]</code>%0A<b>Pipeline Host : </b><code>$KBUILD_BUILD_HOST</code>%0A<b>Host Core Count : </b><code>$PROCS</code>%0A<b>Compiler Used : </b><code>$KBUILD_COMPILER_STRING</code>%0A<b>Linker : </b><code>$LINKER</code>%0a<b>Branch : </b><code>$CI_BRANCH</code>%0A<b>Top Commit : </b><code>$COMMIT_HEAD</code>%0A<b>Status : </b>#Nightly"
+		tg_post_msg "<b>$KBUILD_BUILD_VERSION CI Build Triggered</b>%0A<b>Docker OS: </b><code>$DISTRO</code>%0A<b>Kernel Version : </b><code>$KERVER</code>%0A<b>Date : </b><code>$(TZ=Asia/Jakarta date)</code>%0A<b>Device : </b><code>$MODEL [$DEVICE]</code>%0A<b>Pipeline Host : </b><code>$KBUILD_BUILD_HOST</code>%0A<b>Host Core Count : </b><code>$PROCS</code>%0A<b>Compiler Used : </b><code>$KBUILD_COMPILER_STRING</code>%0A<b>Linker : </b><code>$LINKER</code>%0a<b>Branch : </b><code>$CI_BRANCH</code>%0A<b>Top Commit : </b><code>$COMMIT_HEAD</code>%0A<a href='$SERVER_URL'>Link</a>"
 	fi
 
 	make O=out $DEFCONFIG
@@ -318,7 +328,7 @@ gen_zip() {
 		mv "$KERNEL_DIR"/out/arch/arm64/boot/dtbo.img AnyKernel3/dtbo.img
 	fi
 	cdir AnyKernel3
-	zip -r9 $ZIPNAME-$DEVICE-"$DATE" * -x .git README.md *.zip
+	zip -r $ZIPNAME-$DEVICE-"$DATE" . -x ".git*" -x "README.md" -x "*.zip"
 
 	## Prepare a final zip variable
 	ZIP_FINAL="$ZIPNAME-$DEVICE-$DATE"
