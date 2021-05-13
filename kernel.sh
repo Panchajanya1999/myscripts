@@ -20,6 +20,9 @@
 
 #Kernel building script
 
+# Bail out if script fails
+set -e
+
 # Function to show an informational message
 msg() {
 	echo
