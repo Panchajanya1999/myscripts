@@ -24,6 +24,10 @@
         ZIPNAME    - This is literally the name of our kernel which you would prefer. This
                      applies to the name of the zip too.
 
+	AUTHOR     - It is you. Set your Name here ;)
+	
+	ARCH	- Architcture of your device. Most recent devices are arm64.
+
         MODEL      - Name of your device, which is known to the market.
 
         DEVICE     - The codename of your device. 
@@ -32,6 +36,11 @@
                      you will need to build kernel. In case your source has the defconfig 
                      inside /arch/arm64/configs/vendor , then you need to set it as
                      '/vendor/<name of your defconfig>'
+
+	COMPILER  - Specifies the compiler. Make sure your kernel has all patches (if required
+			for your kernel).
+
+	LINKER	 - Specifies linker to link programs. Defaults to LLD.
 
         INCREMENTAL- Whether you are going to clean your local source each time prior building
                      or not.
