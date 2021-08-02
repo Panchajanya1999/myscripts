@@ -119,6 +119,10 @@ SIGN=1
 # 1 is YES(default) | 0 is NO
 SILENCE=0
 
+# Verbose build
+# 0 is Quiet(default)) | 1 is verbose | 2 gives reason for rebuilding targets
+VERBOSE=0
+
 # Debug purpose. Send logs on every successfull builds
 # 1 is YES | 0 is NO(default)
 LOG_DEBUG=0
@@ -299,7 +303,9 @@ build_kernel() {
 	make -kj"$PROCS" O=out \
 		NM=llvm-nm \
 		OBJCOPY=llvm-objcopy \
-		LD=$LINKER "${MAKE[@]}" 2>&1 | tee error.log
+		LD=$LINKER \
+		V=$VERBOSE \
+		"${MAKE[@]}" 2>&1 | tee error.log
 
 		BUILD_END=$(date +"%s")
 		DIFF=$((BUILD_END - BUILD_START))
