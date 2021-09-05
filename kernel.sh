@@ -288,7 +288,8 @@ build_kernel() {
 			CC=clang \
 			AR=llvm-ar \
 			OBJDUMP=llvm-objdump \
-			STRIP=llvm-strip
+			STRIP=llvm-strip \
+			LD="$LINKER"
 		)
 	elif [ $COMPILER = "gcc" ]
 	then
@@ -297,7 +298,8 @@ build_kernel() {
 			CROSS_COMPILE=aarch64-elf- \
 			AR=aarch64-elf-ar \
 			OBJDUMP=aarch64-elf-objdump \
-			STRIP=aarch64-elf-strip
+			STRIP=aarch64-elf-strip \
+			LD="$CROSS_COMPILE$LINKER"
 		)
 	fi
 	
@@ -310,7 +312,6 @@ build_kernel() {
 	make -kj"$PROCS" O=out \
 		NM=llvm-nm \
 		OBJCOPY=llvm-objcopy \
-		LD=$LINKER \
 		V=$VERBOSE \
 		"${MAKE[@]}" 2>&1 | tee error.log
 	if [ $MODULES = "1" ]
