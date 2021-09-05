@@ -301,7 +301,7 @@ build_kernel() {
 			AR=aarch64-elf-ar \
 			OBJDUMP=aarch64-elf-objdump \
 			STRIP=aarch64-elf-strip \
-			LD="$CROSS_COMPILE$LINKER"
+			LD=aarch64-elf-$LINKER
 		)
 	fi
 	
