@@ -26,13 +26,13 @@ set -e
 # Function to show an informational message
 msg() {
 	echo
-    echo -e "\e[1;32m$*\e[0m"
-    echo
+	echo -e "\e[1;32m$*\e[0m"
+	echo
 }
 
 err() {
-    echo -e "\e[1;41m$*\e[0m"
-    exit 1
+	echo -e "\e[1;41m$*\e[0m"
+	exit 1
 }
 
 cdir() {
