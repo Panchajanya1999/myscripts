@@ -291,6 +291,8 @@ build_kernel() {
 			AR=llvm-ar \
 			OBJDUMP=llvm-objdump \
 			STRIP=llvm-strip \
+			NM=llvm-nm \
+			OBJCOPY=llvm-objcopy \
 			LD="$LINKER"
 		)
 	elif [ $COMPILER = "gcc" ]
@@ -301,6 +303,8 @@ build_kernel() {
 			AR=aarch64-elf-ar \
 			OBJDUMP=aarch64-elf-objdump \
 			STRIP=aarch64-elf-strip \
+			NM=aarch64-elf-nm \
+			OBJCOPY=aarch64-elf-objcopy \
 			LD=aarch64-elf-$LINKER
 		)
 	fi
@@ -312,8 +316,6 @@ build_kernel() {
 
 	msg "|| Started Compilation ||"
 	make -kj"$PROCS" O=out \
-		NM=llvm-nm \
-		OBJCOPY=llvm-objcopy \
 		V=$VERBOSE \
 		"${MAKE[@]}" 2>&1 | tee error.log
 	if [ $MODULES = "1" ]
