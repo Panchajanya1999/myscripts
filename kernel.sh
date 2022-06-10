@@ -262,7 +262,7 @@ build_kernel() {
 	if [ $INCREMENTAL = 0 ]
 	then
 		msg "|| Cleaning Sources ||"
-		make clean && make mrproper && rm -rf out
+		make mrproper && rm -rf out
 	fi
 
 	if [ "$PTTG" = 1 ]
