@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 # shellcheck disable=SC2154
 
  # Script For Building Android arm64 Kernel
@@ -24,20 +24,20 @@
 set -e
 
 # Function to show an informational message
-msg() {
-	echo
-	echo -e "\e[1;32m$*\e[0m"
-	echo
+msger()
+{
+	while getopts ":n:e:w:" opt
+	do
+		case "${opt}" in
+			n) printf "[*] $2 \n" ;;
+			e) printf "[×] $2 \n"; return 1 ;;
+		esac
+	done
 }
 
-err() {
-	echo -e "\e[1;41m$*\e[0m"
-	exit 1
-}
-
-cdir() {
-	cd "$1" 2>/dev/null || \
-		err "The directory $1 doesn't exists !"
+cdir()
+{
+	cd "$1" 2>/dev/null || msger -e "The directory $1 doesn't exists !"
 }
 
 ##------------------------------------------------------##
@@ -83,11 +83,11 @@ INCREMENTAL=1
 
 # Push ZIP to Telegram. 1 is YES | 0 is NO(default)
 PTTG=1
-	if [ $PTTG = 1 ]
-	then
-		# Set Telegram Chat ID
-		CHATID="-1001231303646"
-	fi
+if [ $PTTG = 1 ]
+then
+	# Set Telegram Chat ID
+	CHATID="-1001231303646"
+fi
 
 # Generate a full DEFCONFIG prior building. 1 is YES | 0 is NO(default)
 DEF_REG=0
@@ -98,25 +98,26 @@ FILES=Image.gz-dtb
 # Build dtbo.img (select this only if your source has support to building dtbo.img)
 # 1 is YES | 0 is NO(default)
 BUILD_DTBO=1
-	if [ $BUILD_DTBO = 1 ]
-	then 
-		# Set this to your dtbo path. 
-		# Defaults in folder out/arch/arm64/boot/dts
-		DTBO_PATH="xiaomi/violet-sm6150-overlay.dtbo"
-	fi
+if [ $BUILD_DTBO = 1 ]
+then 
+	# Set this to your dtbo path. 
+	# Defaults in folder out/arch/arm64/boot/dts
+	DTBO_PATH="xiaomi/violet-sm6150-overlay.dtbo"
+fi
 
 # Sign the zipfile
 # 1 is YES | 0 is NO
 SIGN=1
-	if [ $SIGN = 1 ]
-	then
-		#Check for java
-		if command -v java > /dev/null 2>&1; then
-			SIGN=1
-		else
-			SIGN=0
-		fi
+if [ $SIGN = 1 ]
+then
+	#Check for java
+	if ! hash java 2>/dev/null 2>&1; then
+		SIGN=0
+		msger -n "you may need to install java, if you wanna have Signing enabled"
+	else
+		SIGN=1
 	fi
+fi
 
 # Silence the compilation
 # 1 is YES(default) | 0 is NO
@@ -139,11 +140,10 @@ LOG_DEBUG=0
 ## Set defaults first
 
 # shellcheck source=/etc/os-release
-DISTRO=$(source /etc/os-release && echo "${NAME}")
-KBUILD_BUILD_HOST=$(uname -a | awk '{print $2}')
-CI_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+export DISTRO=$(source /etc/os-release && echo "${NAME}")
+export KBUILD_BUILD_HOST=$(uname -a | awk '{print $2}')
+export CI_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 TERM=xterm
-export KBUILD_BUILD_HOST CI_BRANCH TERM
 
 ## Check for CI
 if [ "$CI" ]
@@ -162,7 +162,7 @@ then
 		export BASEDIR=$DRONE_REPO_NAME # overriding
 		export SERVER_URL="${DRONE_SYSTEM_PROTO}://${DRONE_SYSTEM_HOSTNAME}/${AUTHOR}/${BASEDIR}/${KBUILD_BUILD_VERSION}"
 	else
-		echo "Not presetting Build Version"
+		msger -n "Not presetting Build Version"
 	fi
 fi
 
@@ -178,11 +178,12 @@ DATE=$(TZ=Asia/Kolkata date +"%Y%m%d-%T")
 
 #Now Its time for other stuffs like cloning, exporting, etc
 
- clone() {
+ clone()
+ {
 	echo " "
 	if [ $COMPILER = "gcc" ]
 	then
-		msg "|| Cloning GCC 9.3.0 baremetal ||"
+		msger -n "|| Cloning GCC 9.3.0 baremetal ||"
 		git clone --depth=1 https://github.com/mvaisakh/gcc-arm64.git gcc64
 		git clone --depth=1 https://github.com/arter97/arm32-gcc.git gcc32
 		GCC64_DIR=$KERNEL_DIR/gcc64
@@ -191,25 +192,26 @@ DATE=$(TZ=Asia/Kolkata date +"%Y%m%d-%T")
 	
 	if [ $COMPILER = "clang" ]
 	then
-		msg "|| Cloning Clang-16||"
+		msger -n "|| Cloning Clang-16||"
 		git clone --depth=1 https://gitlab.com/dakkshesh07/neutron-clang.git clang-llvm
 		# Toolchain Directory defaults to clang-llvm
 		TC_DIR=$KERNEL_DIR/clang-llvm
 	fi
 
-	msg "|| Cloning Anykernel ||"
+	msger -n "|| Cloning Anykernel ||"
 	git clone --depth 1 --no-single-branch https://github.com/"$AUTHOR"/AnyKernel3.git
 
 	if [ $BUILD_DTBO = 1 ]
 	then
-		msg "|| Cloning libufdt ||"
+		msger -n "|| Cloning libufdt ||"
 		git clone https://android.googlesource.com/platform/system/libufdt "$KERNEL_DIR"/scripts/ufdt/libufdt
 	fi
 }
 
 ##------------------------------------------------------##
 
-exports() {
+exports()
+{
 	KBUILD_BUILD_USER=$AUTHOR
 	SUBARCH=$ARCH
 
@@ -234,7 +236,8 @@ exports() {
 
 ##---------------------------------------------------------##
 
-tg_post_msg() {
+tg_post_msg()
+{
 	curl -s -X POST "$BOT_MSG_URL" -d chat_id="$CHATID" \
 	-d "disable_web_page_preview=true" \
 	-d "parse_mode=html" \
@@ -242,9 +245,10 @@ tg_post_msg() {
 
 }
 
-##----------------------------------------------------------------##
+##----------------------------------------------------------##
 
-tg_post_build() {
+tg_post_build()
+{
 	#Post MD5Checksum alongwith for easeness
 	MD5CHECK=$(md5sum "$1" | cut -d' ' -f1)
 
@@ -258,10 +262,11 @@ tg_post_build() {
 
 ##----------------------------------------------------------##
 
-build_kernel() {
+build_kernel()
+{
 	if [ $INCREMENTAL = 0 ]
 	then
-		msg "|| Cleaning Sources ||"
+		msger -n "|| Cleaning Sources ||"
 		make mrproper && rm -rf out
 	fi
 
@@ -314,13 +319,13 @@ build_kernel() {
 		MAKE+=( -s )
 	fi
 
-	msg "|| Started Compilation ||"
+	msger -n "|| Started Compilation ||"
 	make -kj"$PROCS" O=out \
 		V=$VERBOSE \
 		"${MAKE[@]}" 2>&1 | tee error.log
 	if [ $MODULES = "1" ]
 	then
-	    msg "|| Started Compiling Modules ||"
+	    msger -n "|| Started Compiling Modules ||"
 	    make -j"$PROCS" O=out \
 		 "${MAKE[@]}" modules_prepare
 	    make -j"$PROCS" O=out \
@@ -335,10 +340,10 @@ build_kernel() {
 
 		if [ -f "$KERNEL_DIR"/out/arch/arm64/boot/$FILES ]
 		then
-			msg "|| Kernel successfully compiled ||"
+			msger -n "|| Kernel successfully compiled ||"
 			if [ $BUILD_DTBO = 1 ]
 			then
-				msg "|| Building DTBO ||"
+				msger -n "|| Building DTBO ||"
 				tg_post_msg "<code>Building DTBO..</code>"
 				python2 "$KERNEL_DIR/scripts/ufdt/libufdt/utils/src/mkdtboimg.py" \
 					create "$KERNEL_DIR/out/arch/arm64/boot/dtbo.img" --page_size=4096 "$KERNEL_DIR/out/arch/arm64/boot/dts/$DTBO_PATH"
@@ -355,8 +360,9 @@ build_kernel() {
 
 ##--------------------------------------------------------------##
 
-gen_zip() {
-	msg "|| Zipping into a flashable zip ||"
+gen_zip()
+{
+	msger -n "|| Zipping into a flashable zip ||"
 	mv "$KERNEL_DIR"/out/arch/arm64/boot/$FILES AnyKernel3/$FILES
 	if [ $BUILD_DTBO = 1 ]
 	then
@@ -373,7 +379,7 @@ gen_zip() {
 		## Sign the zip before sending it to telegram
 		if [ "$PTTG" = 1 ]
  		then
- 			msg "|| Signing Zip ||"
+ 			msger -n "|| Signing Zip ||"
 			tg_post_msg "<code>Signing Zip file with AOSP keys..</code>"
  		fi
 		curl -sLo zipsigner-3.0.jar https://github.com/Magisk-Modules-Repo/zipsigner/raw/master/bin/zipsigner-3.0-dexed.jar
