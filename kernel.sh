@@ -26,7 +26,7 @@ set -e
 # Function to show an informational message
 msger()
 {
-	while getopts ":n:e:w:" opt
+	while getopts ":n:e:" opt
 	do
 		case "${opt}" in
 			n) printf "[*] $2 \n" ;;
