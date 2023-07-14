@@ -67,7 +67,7 @@ DEVICE="violet"
 # your device or check source
 DEFCONFIG=vendor/violet-perf_defconfig
 
-# Specify compiler. 
+# Specify compiler.
 # 'clang' or 'gcc'
 COMPILER=clang
 
@@ -99,8 +99,8 @@ FILES=Image.gz-dtb
 # 1 is YES | 0 is NO(default)
 BUILD_DTBO=1
 if [ $BUILD_DTBO = 1 ]
-then 
-	# Set this to your dtbo path. 
+then
+	# Set this to your dtbo path.
 	# Defaults in folder out/arch/arm64/boot/dts
 	DTBO_PATH="xiaomi/violet-sm6150-overlay.dtbo"
 fi
@@ -173,7 +173,7 @@ KERVER=$(make kernelversion)
 # Set a commit head
 COMMIT_HEAD=$(git log --oneline -1)
 
-# Set Date 
+# Set Date
 DATE=$(TZ=Asia/Kolkata date +"%Y%m%d-%T")
 
 #Now Its time for other stuffs like cloning, exporting, etc
@@ -189,7 +189,7 @@ DATE=$(TZ=Asia/Kolkata date +"%Y%m%d-%T")
 		GCC64_DIR=$KERNEL_DIR/gcc64
 		GCC32_DIR=$KERNEL_DIR/gcc32
 	fi
-	
+
 	if [ $COMPILER = "clang" ]
 	then
 		msger -n "|| Cloning Clang-16||"
@@ -286,7 +286,7 @@ build_kernel()
 	fi
 
 	BUILD_START=$(date +"%s")
-	
+
 	if [ $COMPILER = "clang" ]
 	then
 		MAKE+=(
@@ -313,7 +313,7 @@ build_kernel()
 			LD=aarch64-elf-$LINKER
 		)
 	fi
-	
+
 	if [ $SILENCE = "1" ]
 	then
 		MAKE+=( -s )
@@ -355,7 +355,7 @@ build_kernel()
 				tg_post_build "error.log" "*Build failed to compile after $((DIFF / 60)) minute(s) and $((DIFF % 60)) seconds*"
 			fi
 		fi
-	
+
 }
 
 ##--------------------------------------------------------------##
