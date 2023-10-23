@@ -107,7 +107,7 @@ def exports():
         KBUILD_COMPILER_STRING = subprocess.getoutput(f"{TC_DIR}/bin/clang --version | head -n 1 | perl -pe 's/\(http.*?\)//gs' | sed -e 's/  */ /g' -e 's/[[:space:]]*$//'")
         os.environ["PATH"] = f"{TC_DIR}/bin/:{os.environ['PATH']}"
     elif COMPILER == "gcc":
-        KBUILD_COMPILER_STRING = subprocess.getoutput(f"{GCC64_DIR}/bin/aarch64-elf-gcc --version | head -n 1}")
+        KBUILD_COMPILER_STRING = subprocess.getoutput(f"{GCC64_DIR}/bin/aarch64-elf-gcc --version | head -n 1")
         os.environ["PATH"] = f"{GCC64_DIR}/bin/:{GCC32_DIR}/bin/:/usr/bin:{os.environ['PATH']}"
 
     BOT_MSG_URL = "https://api.telegram.org/bot{token}/sendMessage"
