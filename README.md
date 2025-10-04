@@ -18,37 +18,37 @@
 ```
   1. This script has most of it's stuffs in "Basic Information" part. In a nutshell, 
 
-        KERENL_DIR - Points to the working directory, literally inside the actual kernel 
+        KERENL_DIR 	- Points to the working directory, literally inside the actual kernel 
                      source.
 
-        ZIPNAME    - This is literally the name of our kernel which you would prefer. This
+        ZIPNAME    	- This is literally the name of our kernel which you would prefer. This
                      applies to the name of the zip too.
 
-	AUTHOR     - It is you. Set your Name here ;)
+		AUTHOR     	- It is you. Set your Name here ;)
 	
-	ARCH	- Architcture of your device. Most recent devices are arm64.
+		ARCH		- Architcture of your device. Most recent devices are arm64.
 
-        MODEL      - Name of your device, which is known to the market.
+        MODEL      	- Name of your device, which is known to the market.
 
-        DEVICE     - The codename of your device. 
+        DEVICE     	- The codename of your device. 
 
-        DEFCONFIG  - To build a kernel, you need a defconfig. It defines the defconfig which
+        DEFCONFIG  	- To build a kernel, you need a defconfig. It defines the defconfig which
                      you will need to build kernel. In case your source has the defconfig 
                      inside /arch/arm64/configs/vendor , then you need to set it as
                      '/vendor/<name of your defconfig>'
 
-	COMPILER  - Specifies the compiler. Make sure your kernel has all patches (if required
-			for your kernel).
+		COMPILER  	- Specifies the compiler. Make sure your kernel has all patches (if required
+					for your kernel).
 
-	LINKER	 - Specifies linker to link programs. Defaults to LLD.
+		LINKER	  	- Specifies linker to link programs. Defaults to LLD.
 
-        INCREMENTAL- Whether you are going to clean your local source each time prior building
+        INCREMENTAL	- Whether you are going to clean your local source each time prior building
                      or not.
 
                      1 - No, You are not going to clean. Faster building times [ dirty ]
                      0 - Yeah, You are going to clean local everytime [ clean ]
 
-        PTTG       - Abbreviation of Push To Telegram.
+        PTTG       	- Abbreviation of Push To Telegram.
                      It is a general notifier, notifying you about build initialisation. Also
                      it delivers the ZIP file of the kernel.
 
@@ -76,8 +76,8 @@
         SIGN 	   - It sign the ZIP with AOSP Sign Keys for Package Signature verfication in 
 	             custom recoveries. 
 
-		     1 - Yes, sign the ZIP
-	             0 - No, thanks.
+				     1 - Yes, sign the ZIP
+					 0 - No, thanks.
 
         SILENCE	   - It literally silences the compilation output. Only warnings / errors
                      are shown on ouput stream (terminal). It is useful to catch warnings
